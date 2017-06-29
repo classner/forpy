@@ -1,0 +1,11 @@
+_skbuild
+build
+*.egg-info
+*.pyc
+dist
+forpy.*
+libforpy_core.*
+builddbg
+buildclang
+test/python/test.ft
+build_support/external/glog/glog-v0.3.5/test-driver
