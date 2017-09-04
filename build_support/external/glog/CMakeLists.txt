@@ -4,5 +4,5 @@ ExternalProject_Add (glog
   CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR> -DWITH_GFLAGS=Off
 )
 ExternalProject_Get_Property(glog install_dir)
-set (GLOG_BINARY "${install_dir}/lib/libglog.a" PARENT_SCOPE)
-set (GLOG_INCLUDE "${install_dir}/include" PARENT_SCOPE)
+set (GLOG_BINARY  "${CMAKE_CURRENT_BINARY_DIR}/glog/lib/libglog.a" PARENT_SCOPE)
+set (GLOG_INCLUDE  "${CMAKE_CURRENT_BINARY_DIR}/glog/include" PARENT_SCOPE)

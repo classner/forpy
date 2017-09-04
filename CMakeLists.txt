@@ -80,13 +80,14 @@ include_directories ("build_support/external/variant-v1.1.4/include")
 
 # Targets.
 add_subdirectory ("build_support/external/googletest-v1.8.0")
-add_subdirectory ("test")
 add_subdirectory ("build_support/external/glog")
 include_directories (${GLOG_INCLUDE})
+include_directories ("${CMAKE_CURRENT_BINARY_DIR}/glog/glog/include")
 
 add_subdirectory ("include")
 add_subdirectory ("src")
 add_subdirectory ("bindings/python")
+add_subdirectory ("test")
 
 enable_testing()
 # Create the examples.

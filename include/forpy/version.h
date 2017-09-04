@@ -4,4 +4,4 @@
 static unsigned int FORPY_LIB_VERSION() { return 200U; }
 #pragma clang diagnostic pop
 // OpenCV availability information.
-#define WITH_OPENCV
+/* #undef WITH_OPENCV */

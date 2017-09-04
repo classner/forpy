@@ -36,7 +36,12 @@ REQS = [str(ir.req) for ir in parse_requirements('requirements.txt',
 try:
     subprocess.check_call(["cmake", "--version"])
 except:  # pylint: disable=bare-except
-    REQS.append("cmake")
+    try:
+        subprocess.check_call([sys.executable,
+                               '-m', 'pip', 'install', 'cmake'])
+    except:  # pylint: disable=bare-except
+        print "Automatic installation failed. Please install `cmake` and "
+        print "rerun the package setup!"
 
 def python_test_suite():
     """Discover all python tests."""
