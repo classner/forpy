@@ -64,13 +64,13 @@ namespace forpy {
       throw Forpy_Exception("Tried to process a node where none was "
         "left.");
     }
-
-    std::cout << "in make_node" << std::endl;
     // Get the data to work with.
     elem_id_vec_t element_id_list;
     unsigned int node_depth;
     node_id_t node_id;
     std::tie(element_id_list, node_id, node_depth) = marks.front();
+    VLOG(10) << "Processing node with id " << node_id << " at depth "
+             << node_depth << " with " << element_id_list.size() << " samples.";
     marks.pop_front();
     // Assert that there are sufficiently many elements there.
     FASSERT(element_id_list.size() >= this->min_samples_at_leaf);
@@ -88,7 +88,8 @@ namespace forpy {
     // Check min_samples_at_node and max_tree_depth.
     if (element_id_list.size() < min_samples_at_node ||
         node_depth >= max_depth) {
-      std::cout << "making leaf" << element_id_list.size() << std::endl;
+      VLOG(11) << "Making leaf (too few samples or too much depth) with "
+               << element_id_list.size() << " samples.";
       data_provider -> load_samples_for_leaf(node_id,
                                              nullptr,
                                              &element_id_list);
@@ -99,7 +100,7 @@ namespace forpy {
     // Construct a classifier using them.
     bool make_to_leaf;
     elem_id_vec_t list_left, list_right;
-    std::cout << "before entering decider " << element_id_list.size() << std::endl;
+    VLOG(11) << "Making decision node... ";
     std::tie(make_to_leaf, list_left, list_right) =
       decider -> make_node(node_id,
                            node_depth,
@@ -109,14 +110,15 @@ namespace forpy {
 
     // If the classifier manager couldn't find a sufficiently good split.
     if (make_to_leaf) {
-      std::cout << "making leaf" << std::endl;
+      VLOG(11) << "Making leaf (no sufficiently good split found) with "
+               << element_id_list.size() << " samples...";
       data_provider -> load_samples_for_leaf(node_id,
                                              node_predictor_func,
                                              &element_id_list);
       leaf_manager -> make_leaf(node_id, element_id_list, *data_provider);
       stored_in_leafs += element_id_list.size();
     } else {
-      std::cout << "making split" << std::endl;
+      VLOG(11) << "Creating child node todos...";
       FASSERT(list_left.size() >= this -> min_samples_at_leaf);
       FASSERT(list_right.size() >= this -> min_samples_at_leaf);
       // Left child.

@@ -4,6 +4,8 @@
 #define FORPY_GLOBAL_H_
 
 #include "./version.h"
+#include <iostream>
+#include <iomanip>      // std::setprecision
 #include <glog/logging.h>
 
 
@@ -47,8 +49,9 @@ namespace forpy {
   inline void init() {
     google::InitGoogleLogging("");
     FLAGS_logtostderr = 1;
-    LOG(INFO) << "forpy version " <<
-      static_cast<float>(FORPY_LIB_VERSION()) / 100.f << " initialized.";
+    LOG(INFO) << "forpy version " << std::setprecision(2) << std::fixed <<
+      static_cast<float>(FORPY_LIB_VERSION()) / 100.f << " initialized." <<
+      std::defaultfloat;
   }
 
   // This library's exception type.

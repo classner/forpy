@@ -137,15 +137,17 @@ namespace forpy {
                                                          min_samples_at_leaf);
             if (! std::get<5>(opt_res)) {
               // Not valid.
-              std::cout << "Received invalid flag." << std::endl;
+              VLOG(20) << "Received invalid flag.";
               continue;
             } else {
               valids_tried += 1;
-              //std::cout << "received valid result: " << std::endl;
+              VLOG(25) << "Received valid result.";
             }
             float gain = std::get<4>(opt_res);
-            //std::cout << "gain: " << std::setprecision(17) << gain << std::endl;
+            VLOG(25) << "Gain: " << std::setprecision(17) << gain;
             if (gain >= best_gain + GAIN_EPS) {
+              VLOG(24) << "New best gain split found. Old gain: " << best_gain
+                       << ". New: " << gain;
               best_gain = gain;
               best_tpl = opt_res;
               best_feats = feat_ids;
@@ -154,12 +156,15 @@ namespace forpy {
           if (best_gain < threshold_optimizer->get_gain_threshold_for(node_id) ||
               std::get<2>(best_tpl) < min_samples_at_leaf ||
               std::get<3>(best_tpl) < min_samples_at_leaf) {
-            std::cout << "creating leaf. best gain: " << best_gain << std::endl;
-            std::cout << "samples to left: " << std::get<2>(best_tpl) << std::endl;
-            std::cout << "samples to right: " << std::get<3>(best_tpl) << std::endl;
+            VLOG(20) << "Suggesting to create a leaf. Best gain found: "
+                     << best_gain;
+            VLOG(20) << "For that gain, samples that needed to go left: "
+                     << std::get<2>(best_tpl);
+            VLOG(20) << "For that gain, samples that needed to go right: "
+                     << std::get<3>(best_tpl);
             std::get<0>(ret_tpl) = true;
           } else {
-            std::cout << "splitting" << std::endl;
+            VLOG(20) << "Suggesting to create a split.";
             std::get<0>(ret_tpl) = false;
             auto ret = node_to_featsel.emplace(node_id,
                                                std::move(best_feats));
@@ -167,15 +172,12 @@ namespace forpy {
               throw Forpy_Exception("Tried to recreate a node with existing "
                                     "parameters: id " + std::to_string(node_id));
             }
-            //std::cout << "c1" << std::endl;
             auto &node_to_thresh = node_to_thresh_v.get<std::unordered_map<node_id_t, IT>>();
             auto ret_2 = node_to_thresh.emplace(node_id,
                                                 std::get<0>(best_tpl).first);
-            //std::cout << "c2" << std::endl;
             if (! ret_2.second) {
               throw Forpy_Exception("Internal error.");
             }
-            //std::cout << "c3" << std::endl;
             // Create the element lists.
             auto element_list_left = &std::get<1>(ret_tpl);
             auto element_list_right = &std::get<2>(ret_tpl);
@@ -188,7 +190,6 @@ namespace forpy {
                 element_list_right -> push_back(element_id);
               }
             }
-            std::cout << "c4" << std::endl;
             // Check.
             FASSERT(std::get<2>(best_tpl) == element_list_left->size() &&
                     std::get<3>(best_tpl) == element_list_right->size());
