@@ -15,7 +15,9 @@ namespace forpy {
     swr.def(py::init<size_t, size_t, std::shared_ptr<std::mt19937>>());
     FORPY_EXPFUNC(swr, SamplingWithoutReplacement<size_t>, sample_available);
     FORPY_EXPFUNC(swr, SamplingWithoutReplacement<size_t>, get_next);
+    FORPY_DEFAULT_REPR(swr, SamplingWithoutReplacement<size_t>);
 
+    m.def("unique_indices", &unique_indices<int64_t>);
     FORPY_EXPCLASS(Empty, ety);
     ety.def(py::init<>());
   }

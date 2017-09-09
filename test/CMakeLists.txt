@@ -13,6 +13,10 @@ else()
   set_target_properties (forpy_tests PROPERTIES INSTALL_RPATH "$ORIGIN/:$$ORIGIN")
 endif()
 target_link_libraries(forpy_tests gtest_main forpy_core ${OpenCV_COMPATIBLE_LIBRARIES})
+set_target_properties(forpy_tests PROPERTIES
+  COTIRE_PREFIX_HEADER_INCLUDE_PATH
+  "${CMAKE_SOURCE_DIR}/build_support/external")
+cotire (forpy_tests)
 
 # Installation.
 install (TARGETS forpy_tests DESTINATION tests)

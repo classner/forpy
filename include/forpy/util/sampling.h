@@ -54,6 +54,8 @@ namespace forpy {
    * This needs to be stateful. Hence, it must store for each element
    * whether it has been used yet. This renders it inefficient for use
    * cases where only few instances need to be drawn.
+   *
+   * min and max are both inclusive.
    */
   template <typename T>
   class SamplingWithoutReplacement {
@@ -81,9 +83,6 @@ namespace forpy {
      */
     T get_next() {
       T return_value;
-      // Critical section not necessary here. The synchronization is done in
-      // the calling section.
-      //#pragma omp critical (FORPY_EXECUTION_STRATEGY_H_SAMPLINGWITHOUTREPLACEMENT_)
       {
         if (index >= indices.size())
           throw Forpy_Exception("Tried to redraw without replacement "
@@ -95,6 +94,14 @@ namespace forpy {
         return_value = min + indices[index++];
       }
       return return_value;
+    };
+
+    inline friend std::ostream &operator<<(std::ostream &stream,
+                                           const SamplingWithoutReplacement &self) {
+      stream << "forpy::SamplingWithoutReplacement[" <<
+        self.min << " (inc):" << (self.min + self.indices.size() - 1) << " (inc), " <<
+        (self.indices.size() - self.index) << " available]";
+      return stream;
     };
 
     bool operator==(const SamplingWithoutReplacement<T> &rhs) const {
@@ -126,7 +133,7 @@ namespace forpy {
   };
 
   /**
-   * \brief Complete sampling without replacement.
+   * \brief Sampling without replacement.
    *
    * Returns a set of num unique numbers in range [min, max]. T must be an
    * integral datatype.
@@ -153,163 +160,47 @@ namespace forpy {
    */
   template <typename T>
   static std::vector<T> unique_indices(T num,
-    T min,
-    const T &max,
-    std::mt19937 *random_engine,
-    bool return_sorted = false) {
+                                       T min,
+                                       const T &max,
+                                       std::mt19937 *random_engine,
+                                       bool return_sorted = false) {
     static_assert(std::is_integral<T>::value, "T must be integral!");
     if (max < min)
       throw Forpy_Exception("Invalid sample range.");
     if (num > max - min + 1)
       throw Forpy_Exception("Sample size larger than range.");
     std::vector<T> result(num);
-    std::geometric_distribution<T> dist;
-    if (num + 1 < max - min + 1) {
-      // Draw unique samples by iterating once over the numbers.
-      // There are only as many 'steps' as there should be numbers drawn.
-      // The difference between two numbers uniquely drawn from the set is
-      // distributed with a geometric distribution.
-      // The mean difference between two numbers is (max-min+1)/(num+1).
-      dist = std::geometric_distribution<T>(static_cast<float>(num + 1) /
-        static_cast<float>(max - min + 1));
-    }
-    // A truncated geometric distribution must be used to guarantee that
-    // all numbers can be drawn from the range. r is the truncation level.
-    // i is the remaining number of elements to be drawn.
-    T r, i = num;
-    while (i--) {
-      r = (max - min + 1 - i);
-      if (r <= 1) {
-        // The next value must be used, since there is no more 'space' for
-        // additional numbers.
-        result[i] = min;
+    if (num == max - min + 1) {
+      // The full range of numbers is required.
+      std::iota(result.begin(), result.end(), min);
+    } else {
+      std::geometric_distribution<T> dist;
+      if (num + 1 < max - min + 1) {
+        // Draw unique samples by iterating once over the numbers.
+        // There are only as many 'steps' as there should be numbers drawn.
+        // The difference between two numbers uniquely drawn from the set is
+        // distributed with a geometric distribution.
+        // The mean difference between two numbers is (max-min+1)/(num+1).
+        dist = std::geometric_distribution<T>(static_cast<float>(num + 1) /
+                                              static_cast<float>(max - min + 1));
       }
-      else {
-        // Do the next step and handle truncation.
-        result[i] = min += std::min<T>(dist(*random_engine) + 1, r - 1);
-      }
-    }
-
-    // The numbers are now ready, sorted in the appropriate interval.
-    if (!return_sorted) {
-      std::shuffle(result.begin(), result.end(), *random_engine);
-    }
-    return result;
-  };
-
-  /**
-   * \brief Partial specialization for uint8_t.
-   *
-   * According to the standard, the std::geometric_distribution is only
-   * defined for short, int, long, long long, unsigned short, unsigned int,
-   * unsigned long, or unsigned long long. Since for the library sometimes
-   * the "char" types are required, the corresponding explicit overloads
-   * are instantiated here. MSVC12 otherwise complains.
-   */
-  template <>
-#ifdef _MSC_VER
-  static
-#endif
-  std::vector<std::uint8_t> unique_indices<std::uint8_t>(
-    std::uint8_t num,
-    std::uint8_t min,
-    const std::uint8_t &max,
-    std::mt19937 *random_engine,
-    bool return_sorted) {
-    if (max < min)
-      throw Forpy_Exception("Invalid sample range.");
-    if (num > max - min + 1)
-      throw Forpy_Exception("Sample size larger than range.");
-    std::vector<std::uint8_t> result(num);
-    std::geometric_distribution<std::uint16_t> dist;
-    if (num + 1 < max - min + 1) {
-      // Draw unique samples by iterating once over the numbers.
-      // There are only as many 'steps' as there should be numbers drawn.
-      // The difference between two numbers uniquely drawn from the set is
-      // distributed with a geometric distribution.
-      // The mean difference between two numbers is (max-min+1)/(num+1).
-      dist = std::geometric_distribution<std::uint16_t>(static_cast<float>(num + 1) /
-        static_cast<float>(max - min + 1));
-    }
-    // A truncated geometric distribution must be used to guarantee that
-    // all numbers can be drawn from the range. r is the truncation level.
-    // i is the remaining number of elements to be drawn.
-    std::uint8_t r, i = num;
-    std::uint16_t maxallowed = std::numeric_limits<uint8_t>::max() - 1;
-    while (i--) {
-      r = (max - min + 1 - i);
-      if (r <= 1) {
-        // The next value must be used, since there is no more 'space' for
-        // additional numbers.
-        result[i] = min;
-      }
-      else {
-        // Do the next step and handle truncation.
-        result[i] = min += std::min<std::uint8_t>(static_cast<std::uint8_t>(std::min<uint16_t>(maxallowed, dist(*random_engine))) + 1,
-                                                  r - 1);
+      // A truncated geometric distribution must be used to guarantee that
+      // all numbers can be drawn from the range. r is the truncation level.
+      // i is the remaining number of elements to be drawn.
+      T r, i = num;
+      while (i--) {
+        r = (max - min + 1 - i);
+        if (r <= 1) {
+          // The next value must be used, since there is no more 'space' for
+          // additional numbers.
+          result[i] = min;
+        }
+        else {
+          // Do the next step and handle truncation.
+          result[i] = min += std::min<T>(dist(*random_engine) + 1, r - 1);
+        }
       }
     }
-
-    // The numbers are now ready, sorted in the appropriate interval.
-    if (!return_sorted) {
-      std::shuffle(result.begin(), result.end(), *random_engine);
-    }
-    return result;
-  };
-
-  /**
-   * \brief Partial specialization for int8_t.
-   *
-   * According to the standard, the std::geometric_distribution is only
-   * defined for short, int, long, long long, unsigned short, unsigned int,
-   * unsigned long, or unsigned long long. Since for the library sometimes
-   * the "char" types are required, the corresponding explicit overloads
-   * are instantiated here. MSVC12 otherwise complains.
-   */
-  template <>
-#ifdef _MSC_VER
-  static
-#endif
-  std::vector<std::int8_t> unique_indices<std::int8_t>(
-    std::int8_t num,
-    std::int8_t min,
-    const std::int8_t &max,
-    std::mt19937 *random_engine,
-    bool return_sorted) {
-    if (max < min)
-      throw Forpy_Exception("Invalid sample range.");
-    if (num > max - min + 1)
-      throw Forpy_Exception("Sample size larger than range.");
-    std::vector<std::int8_t> result(num);
-    std::geometric_distribution<std::int16_t> dist;
-    if (num + 1 < max - min + 1) {
-      // Draw unique samples by iterating once over the numbers.
-      // There are only as many 'steps' as there should be numbers drawn.
-      // The difference between two numbers uniquely drawn from the set is
-      // distributed with a geometric distribution.
-      // The mean difference between two numbers is (max-min+1)/(num+1).
-      dist = std::geometric_distribution<std::int16_t>(static_cast<float>(num + 1) /
-        static_cast<float>(max - min + 1));
-    }
-    // A truncated geometric distribution must be used to guarantee that
-    // all numbers can be drawn from the range. r is the truncation level.
-    // i is the remaining number of elements to be drawn.
-    std::int8_t r, i = num;
-    std::int16_t maxallowed = std::numeric_limits<int8_t>::max() - 1;
-    while (i--) {
-      r = (max - min + 1 - i);
-      if (r <= 1) {
-        // The next value must be used, since there is no more 'space' for
-        // additional numbers.
-        result[i] = min;
-      }
-      else {
-        // Do the next step and handle truncation.
-        result[i] = min += std::min<std::int8_t>(static_cast<std::int8_t>(std::min<int16_t>(maxallowed, dist(*random_engine))) + 1,
-                                                  r - 1);
-      }
-    }
-
     // The numbers are now ready, sorted in the appropriate interval.
     if (!return_sorted) {
       std::shuffle(result.begin(), result.end(), *random_engine);

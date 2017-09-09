@@ -5,9 +5,16 @@ target_compile_features (forpy_core PRIVATE ${REQ_CPP11_FEATURES})
 set_property(TARGET forpy_core PROPERTY CXX_STANDARD 14)
 target_compile_definitions (forpy_core PRIVATE -D__BUILD_FORPY_LIBRARY)
 target_link_libraries (forpy_core ${GLOG_BINARY})
+if (WITHGPERFTOOLS)
+  target_link_libraries (forpy_core profiler)
+endif()
 if (APPLE)
   set_target_properties (forpy_core PROPERTIES INSTALL_RPATH "@rpath")
 endif()
+set_target_properties(forpy_core PROPERTIES
+  COTIRE_PREFIX_HEADER_INCLUDE_PATH
+  "${CMAKE_SOURCE_DIR}/build_support/external")
+cotire (forpy_core)
 
 install (TARGETS forpy_core DESTINATION lib)
 if (WITH_PYTHON)

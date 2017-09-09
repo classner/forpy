@@ -118,10 +118,7 @@ namespace forpy {
     FORPY_CALL(EXP_ISURFCALC_CALC, ITFT);
     FORPY_EXPCLASS_PARENT(AlignedSurfaceCalculator, asc, isc);
     asc.def(py::init<>());
-
-    m.def("test", [](const mu::variant<std::vector<float>, std::vector<int>> &in) {
-        std::cout << "hello";
-      });
+    FORPY_DEFAULT_REPR(asc, AlignedSurfaceCalculator);
   };
 } // namespace forpy
 

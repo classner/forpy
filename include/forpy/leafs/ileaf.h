@@ -48,6 +48,9 @@ namespace forpy {
     virtual size_t get_result_columns(const size_t &n_trees=1) const
       VIRTUAL(size_t);
 
+    /** Get the result data type (a 0x0 mat within in appropriate variant). */
+    virtual Data<Mat> get_result_type() const VIRTUAL(Data<Mat>);
+
     /**
      * \brief Gets the leaf data for the leaf with the given id.
      */

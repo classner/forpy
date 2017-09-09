@@ -9,7 +9,11 @@ if (WITH_PYTHON)
     pybind11_add_module(forpy MODULE THIN_LTO ${Forpy_CPP})
   endif()
   target_link_libraries(forpy PRIVATE forpy_core)
-  set_target_properties (forpy PROPERTIES PREFIX "")
+  set_target_properties(forpy PROPERTIES PREFIX "")
+  set_target_properties(forpy PROPERTIES
+    COTIRE_PREFIX_HEADER_INCLUDE_PATH
+    "${CMAKE_SOURCE_DIR}/build_support/external")
+  cotire (forpy)
   if (APPLE)
     set_target_properties (forpy PROPERTIES SUFFIX .so)
     set_target_properties (forpy PROPERTIES INSTALL_RPATH "@loader_path/")

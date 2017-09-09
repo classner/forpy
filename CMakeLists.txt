@@ -3,6 +3,8 @@ include(ExternalProject)
 
 project (forpy C CXX)
 list (APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/build_support/cmake/modules)
+list (APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/build_support/cmake/cotire-master/CMake/)
+include(cotire)  # Automatic precompiled headers for fast builds.
 
 # Versioning.
 set (forpy_VERSION_MAJOR 2)
@@ -84,6 +86,12 @@ add_subdirectory ("build_support/external/glog")
 include_directories (${GLOG_INCLUDE})
 include_directories ("${CMAKE_CURRENT_BINARY_DIR}/glog/glog/include")
 
+# Profiling tools.
+if (WITHGPERFTOOLS)
+  set (CMAKE_BUILD_TYPE RelWithDebInfo)
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DWITHGPERFTOOLS")
+endif()
+
 add_subdirectory ("include")
 add_subdirectory ("src")
 add_subdirectory ("bindings/python")
@@ -113,6 +121,7 @@ endif ()
 message ("")
 message ("Compiler options:")
 message ("  Build type: " ${CMAKE_BUILD_TYPE})
+message ("  Profiling tools: " ${WITHGPERFTOOLS})
 message ("  Compiler flags: " ${CMAKE_CXX_COMPILE_FLAGS})
 message ("  Compiler cxx debug flags: " ${CMAKE_CXX_FLAGS_DEBUG})
 message ("  Compiler cxx release flags: " ${CMAKE_CXX_FLAGS_RELEASE})

@@ -46,7 +46,7 @@ except:  # pylint: disable=bare-except
 def python_test_suite():
     """Discover all python tests."""
     test_loader = unittest.TestLoader()
-    test_suite = test_loader.discover('tests', pattern='test/python/*.py')
+    test_suite = test_loader.discover('test/python', pattern='*.py')
     return test_suite
 
 setup(

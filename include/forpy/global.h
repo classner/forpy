@@ -7,7 +7,9 @@
 #include <iostream>
 #include <iomanip>      // std::setprecision
 #include <glog/logging.h>
-
+#ifdef WITHGPERFTOOLS
+#include <gperftools/profiler.h>
+#endif
 
 #if ! (defined NDEBUG) && defined(_MSC_VER)
 // Solve a MSVC specific name clash between WinDef.h and <algorithm> :(

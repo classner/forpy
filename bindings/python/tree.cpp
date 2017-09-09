@@ -27,7 +27,10 @@ namespace forpy {
     t.def("predict", &Tree::predict,
           py::arg("data").noconvert(),
           py::arg("num_threads")=1,
+          py::arg("use_fast_prediction_if_available")=true,
           py::call_guard<py::gil_scoped_release>());
+    FORPY_EXPFUNC(t, Tree, enable_fast_prediction);
+    FORPY_EXPFUNC(t, Tree, disable_fast_prediction);
     FORPY_EXPFUNC(t, Tree, save);
     FORPY_DEFAULT_REPR(t, Tree);
   };

@@ -1,0 +1,11 @@
+-Iinclude
+-Ibuild_support/external/cereal-v1.2.2/include
+-Ibuild_support/external/eigen3-v3.3
+-Ibuild/build_support/external/glog/glog/include
+-Ibuild_support/external/googletest-v1.8.0/googletest/include
+-Ibuild_support/external/googletest-v1.8.0/googlemock/include
+-Ibuild_support/external/pybind11-master/include
+-Ibuild_support/external/variant-v1.1.4/include
+-std=c++14
+-Wno-unused-function
+-Wno-pragma-once-outside-header

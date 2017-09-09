@@ -262,11 +262,21 @@ namespace forpy {
     }
   };
 
+  Data<Mat> RegressionLeaf::get_result_type() const {
+    Data<Mat> ret_mat;
+    if (double_mode) {
+      ret_mat.set<Mat<double>>();
+    } else {
+      ret_mat.set<Mat<float>>();
+    }
+    return ret_mat;
+  };
+
   void RegressionLeaf::get_result(
       const node_id_t &node_id,
       Data<MatRef> &target,
       const Data<MatCRef> &data,
-      const std::function<void(void*)> &dptf) const {
+      const std::function<void(void*)> &/*dptf*/) const {
     if (annot_dim == 0) {
       throw Forpy_Exception("This leaf has not been initialized yet!");
     }

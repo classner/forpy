@@ -6,7 +6,7 @@ namespace forpy {
     : n_classes(n_classes)
     , stored_distributions(std::unordered_map<node_id_t, Vec<float>>()) {};
 
-  bool ClassificationLeaf::is_compatible_with(const IDataProvider &data_provider) {
+  bool ClassificationLeaf::is_compatible_with(const IDataProvider &/*data_provider*/) {
     return true;
   }
 
@@ -102,10 +102,16 @@ namespace forpy {
     return n_classes;
   };
 
+  Data<Mat> ClassificationLeaf::get_result_type() const {
+    Data<Mat> ret_mat;
+    ret_mat.set<Mat<float>>();
+    return ret_mat;
+  };
+
   void ClassificationLeaf::get_result(const node_id_t &node_id,
                                       Data<MatRef> &target_v,
-                                      const Data<MatCRef> &data,
-                                      const std::function<void(void*)> &dptf) const {
+                                      const Data<MatCRef> &/*data*/,
+                                      const std::function<void(void*)> &/*dptf*/) const {
     MatRef<float> &target = target_v.get<MatRef<float>>();
     const auto stored_dist_it = stored_distributions.find(node_id);
     if (stored_dist_it == stored_distributions.end()) {
@@ -160,5 +166,9 @@ namespace forpy {
       return eq_nc && eq_std;
     }
   };
+
+  const std::unordered_map<node_id_t, Vec<float>> &ClassificationLeaf::get_stored_dists() const {
+    return stored_distributions;
+  }
 
 } // namespace forpy

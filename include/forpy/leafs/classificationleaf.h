@@ -53,6 +53,8 @@ namespace forpy {
 
     size_t get_result_columns(const size_t &n_trees=1) const;
 
+    Data<Mat> get_result_type() const;
+
     void get_result(const node_id_t &node_id,
                     Data<MatRef> &target_v,
                     const Data<MatCRef> &data=Data<MatCRef>(),
@@ -72,10 +74,12 @@ namespace forpy {
       return stream;
     };
 
+    const std::unordered_map<node_id_t, Vec<float>> &get_stored_dists() const;
+
    private:
     friend class cereal::access;
     template<class Archive>
-    void serialize(Archive & ar, const uint file_version) {
+    void serialize(Archive & ar, const uint) {
       ar(cereal::make_nvp("base", cereal::base_class<ILeaf>(this)),
          CEREAL_NVP(n_classes),
          CEREAL_NVP(stored_distributions));

@@ -253,8 +253,8 @@ namespace forpy {
     return best_result;
   };
 
-  float ClassificationThresholdOptimizer::get_gain_threshold_for(
-      const size_t &node_id) {
+  float ClassificationThresholdOptimizer::get_gain_threshold_for
+    (const size_t &/*node_id*/) {
     return gain_threshold;
   };
 

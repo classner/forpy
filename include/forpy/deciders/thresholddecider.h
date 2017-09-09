@@ -21,7 +21,6 @@
 #include "../features/alignedsurfacecalculator.h"
 #include "../threshold_optimizers/ithresholdoptimizer.h"
 #include "../threshold_optimizers/classificationthresholdoptimizer.h"
-#include "../features/featureselector.h"
 #include "./idecider.h"
 
 namespace forpy {
@@ -108,6 +107,8 @@ namespace forpy {
 
     std::shared_ptr<IThresholdOptimizer> get_threshopt() const;
 
+    std::shared_ptr<ISurfaceCalculator> get_featcalc() const;
+
     bool operator==(const IDecider &rhs) const;
 
     inline friend std::ostream &operator<<(std::ostream &stream,
@@ -118,6 +119,13 @@ namespace forpy {
     };
 
     void set_data_dim(const size_t &val);
+
+    std::pair<const std::unordered_map<node_id_t, std::vector<size_t>> *,
+              const mu::variant<std::unordered_map<node_id_t, float>,
+                                std::unordered_map<node_id_t, double>,
+                                std::unordered_map<node_id_t, uint32_t>,
+                                std::unordered_map<node_id_t, uint8_t>> *>
+        get_maps() const;
 
    private:
     ThresholdDecider();

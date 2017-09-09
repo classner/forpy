@@ -102,6 +102,8 @@ namespace forpy {
     /** Gets the number of summary dimensions per sample. */
     size_t get_result_columns(const size_t &n_trees=1) const;
 
+    Data<Mat> get_result_type() const;
+
     void get_result(
         const node_id_t &node_id,
         Data<MatRef> &target,

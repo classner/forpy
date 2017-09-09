@@ -38,6 +38,12 @@ namespace forpy {
 
     FORPY_DECL(FORPY_ISURFCALC_CALCS, ITFTEQ, , ;);
 
+    inline friend std::ostream &operator<<(std::ostream &stream,
+                                           const AlignedSurfaceCalculator &/*self*/) {
+      stream << "forpy::AlignedSurfaceCalculator";
+      return stream;
+    };
+
     bool operator==(const ISurfaceCalculator &rhs) const;
 
    private:

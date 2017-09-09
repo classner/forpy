@@ -226,8 +226,10 @@ namespace forpy {
     this->annot_dim = annotation_mat.cols();
     this->n_samples = sample_mat.rows();
     if (this->n_samples < this->input_dim - 1 + 2) {
-      throw Forpy_Exception("Number of samples must be at least input_dim "
-                            "+ 2!");
+      throw Forpy_Exception("Number of samples (" +
+                            std::to_string(this->n_samples) +
+                            ") must be at least input_dim (" +
+                            std::to_string(this->input_dim - 1) + ") + 2!");
     }
     // Check for rank deficiency.
     Eigen::FullPivLU<Mat<IT>> decomposer(sample_mat);

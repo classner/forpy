@@ -1,3 +1,4 @@
+
 #include <forpy/deciders/thresholddecider.h>
 #include <iomanip>
 
@@ -43,25 +44,24 @@ namespace forpy {
 
   std::tuple<bool, elem_id_vec_t, elem_id_vec_t> ThresholdDecider::make_node(
     const node_id_t &node_id,
-    const uint &node_depth,
+    const uint &/*node_depth*/,
     const uint &min_samples_at_leaf,
     const elem_id_vec_t &element_id_list,
     const IDataProvider &data_provider) {
     //////////////////////////////////////////
     // Checks.
     if (element_id_list.size() == 0) {
-      throw Forpy_Exception("Received an empty element list at a leaf!");
+      throw Forpy_Exception("Received an empty element list at a decision node!");
     }
     size_t n_samples = element_id_list.size();
     size_t input_dim = data_provider.get_feat_vec_dim();
     size_t annot_dim = data_provider.get_annot_vec_dim();
     if (feature_calculator->required_num_features() > input_dim) {
-      throw Forpy_Exception("The feature calc. input dim (" +
-                            std::to_string(feature_calculator->required_num_features()) +
-                            ") is "
-                            "configured to be higher than the data input "
-                            "dimension (" + std::to_string(input_dim) +
-                            "!");
+      throw Forpy_Exception
+        ("The feature calc. input dim (" +
+         std::to_string(feature_calculator->required_num_features()) +
+         ") is configured to be higher than the data input "
+         "dimension (" + std::to_string(input_dim) + "!");
     }
     if (! compat_SurfCalc_DProv_checked) {
       if (! feature_calculator->is_compatible_to(data_provider)) {
@@ -77,7 +77,9 @@ namespace forpy {
     if (input_dim != data_dim) {
       throw Forpy_Exception("Incompatible data provider detected!");
     }
-    auto sample_list_v = data_provider.get_samples();
+    ////////////////////////////////////////////////////////////////////////////
+    // Get the samples and start processing.
+    const auto &sample_list_v = data_provider.get_samples();
     auto ret_tpl = std::make_tuple<bool, elem_id_vec_t, elem_id_vec_t>(
         false, elem_id_vec_t(), elem_id_vec_t());
     sample_list_v.match(
@@ -97,31 +99,34 @@ namespace forpy {
           }
           // Feature selector.
           if (feature_calculator->required_num_features() != 1) {
-            throw Forpy_Exception("Implementeation must be improved here "
+            throw Forpy_Exception("Implementation must be improved here "
                                   "to support multiple inputs for features.");
           }
-          FeatureSelector fsel(input_dim,
-                               feature_calculator->required_num_features(),
-                               input_dim,
-                               0, random_seed + node_id);
-          auto propgen = fsel.get_proposal_generator();
+          // Prepare shuffled indices to test. It's required to prepare all of
+          // them to be potentially tested, since it's a priori unknown how many
+          // will be used (`invalid` results can lead to higher numbers).
+          std::mt19937 node_engine(random_seed + node_id);
+          std::vector<size_t> shuffled_indices(input_dim);
+          std::iota(shuffled_indices.begin(), shuffled_indices.end(), 0);
+          std::shuffle(shuffled_indices.begin(),
+                       shuffled_indices.end(),
+                       node_engine);
+          // The data matrix that will be used.
           auto data_p = std::make_shared<MatCM<IT>>(
               n_samples,
               feature_calculator->required_num_features());
           uint valids_tried = 0;
+          size_t current_feat_id = 0;
           float best_gain = 0.f;
           optimized_split_tuple_t<IT> best_tpl;
           std::vector<size_t> best_feats;
+          std::vector<size_t> feat_ids(1);
           while (valids_tried < n_valids_to_use) {
-            if (! propgen->available()) {
-              break;
-            }
-            auto feat_ids = propgen->get_next();
+            feat_ids[0] = shuffled_indices[current_feat_id];
+            size_t feat_id = feat_ids[0];
+            IT* dp = data_p->data();
             for (size_t s_idx = 0; s_idx < n_samples; ++s_idx) {
-              for (size_t f_idx = 0; f_idx < feat_ids.size(); ++f_idx) {
-                data_p->operator()(s_idx, f_idx) = \
-                  sample_vec[element_id_list[s_idx]].data[feat_ids[f_idx]];
-              }
+              dp[s_idx] = sample_vec[element_id_list[s_idx]].data.data()[feat_id];
             }
             std::shared_ptr<const MatCM<IT>> feature_p;
             std::shared_ptr<const MatCM<IT>> __data_in = std::const_pointer_cast<const MatCM<IT>>(data_p);
@@ -135,6 +140,7 @@ namespace forpy {
                                                          annotations,
                                                          node_id,
                                                          min_samples_at_leaf);
+            current_feat_id++;
             if (! std::get<5>(opt_res)) {
               // Not valid.
               VLOG(20) << "Received invalid flag.";
@@ -167,7 +173,7 @@ namespace forpy {
             VLOG(20) << "Suggesting to create a split.";
             std::get<0>(ret_tpl) = false;
             auto ret = node_to_featsel.emplace(node_id,
-                                               std::move(best_feats));
+                                               best_feats);
             if (! ret.second) {
               throw Forpy_Exception("Tried to recreate a node with existing "
                                     "parameters: id " + std::to_string(node_id));
@@ -181,13 +187,27 @@ namespace forpy {
             // Create the element lists.
             auto element_list_left = &std::get<1>(ret_tpl);
             auto element_list_right = &std::get<2>(ret_tpl);
-            for (const auto &element_id : element_id_list) {
-              if (this->decide(node_id,
-                         sample_vec[element_id].data,
-                         data_provider.get_decision_transf_func(element_id))) {
-                element_list_left -> push_back(element_id);
-              } else {
-                element_list_right -> push_back(element_id);
+            const auto *fc = dynamic_cast<AlignedSurfaceCalculator const *>
+              (feature_calculator.get());
+            if (fc == nullptr) {
+              for (const auto &element_id : element_id_list) {
+                if (this->decide(node_id,
+                                 sample_vec[element_id].data,
+                                 data_provider.get_decision_transf_func(element_id))) {
+                  element_list_left -> push_back(element_id);
+                } else {
+                  element_list_right -> push_back(element_id);
+                }
+              }
+            } else {
+              size_t feat_id = best_feats[0];
+              for (const auto &element_id : element_id_list) {
+                if (sample_vec[element_id].data.data()[feat_id] <
+                    std::get<0>(best_tpl).first) {
+                  element_list_left -> push_back(element_id);
+                } else {
+                  element_list_right -> push_back(element_id);
+                }
               }
             }
             // Check.
@@ -200,9 +220,10 @@ namespace forpy {
     return ret_tpl;
   };
 
-  bool ThresholdDecider::decide(const node_id_t &node_id,
-              const Data<MatCRef> &data_v,
-              const std::function<void(void*)> &decision_param_transf)
+  bool ThresholdDecider::decide
+    (const node_id_t &node_id,
+     const Data<MatCRef> &data_v,
+     const std::function<void(void*)> &/*decision_param_transf*/)
    const {
     // Get the decision parameters.
     auto ntf_pos = node_to_featsel.find(node_id);
@@ -242,6 +263,10 @@ namespace forpy {
     return threshold_optimizer;
   };
 
+  std::shared_ptr<ISurfaceCalculator> ThresholdDecider::get_featcalc() const {
+    return feature_calculator;
+  };
+
   bool ThresholdDecider::operator==(const IDecider &rhs) const {
     const auto *rhs_c = dynamic_cast<ThresholdDecider const *>(&rhs);
     if (rhs_c == nullptr) {
@@ -259,5 +284,13 @@ namespace forpy {
     }
   }; 
 
+  std::pair<const std::unordered_map<node_id_t, std::vector<size_t>> *,
+            const mu::variant<std::unordered_map<node_id_t, float>,
+                              std::unordered_map<node_id_t, double>,
+                              std::unordered_map<node_id_t, uint32_t>,
+                              std::unordered_map<node_id_t, uint8_t>> *>
+    ThresholdDecider::get_maps() const {
+    return std::make_pair(&node_to_featsel, &node_to_thresh_v);
+  };
 
 } // namespace forpy

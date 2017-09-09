@@ -191,8 +191,8 @@ namespace forpy {
      *   of threads to observe very good parallelization behavior.
      */
     Data<Mat> predict(const Data<MatCRef> &data_v,
-                      const int &num_threads=1)
-      const;
+                      const int &num_threads=1,
+                      const bool &use_fast_prediction_if_available=true);
 
     /**
      * \brief Get the data prediction result for the given data.
@@ -260,6 +260,20 @@ namespace forpy {
      */
     std::deque<node_todo_tuple_t> get_marks() const;
 
+    /**
+     * Unpack the hash maps for thresholds and feature IDs for fast predictions.
+     *
+     * This only works for trees with threshold deciders and
+     * AlignedSurfaceCalcluators for the features. Requires more memory than the
+     * default trees, but is significantly faster.
+     */
+    void enable_fast_prediction();
+
+    /**
+     * Frees the memory from the unpacked trees for fast predictions.
+     */
+    void disable_fast_prediction();
+
     bool operator==(Tree const &rhs) const;
 
     /**
@@ -319,6 +333,17 @@ namespace forpy {
     std::shared_ptr<ILeaf> leaf_manager;
     /** Holds the entire tree structure. */
     std::vector<node_id_pair_t> tree;
+    /** Pointer to a structure that can be used for fast predictions.
+
+        Vector ids are node ids. The first value in the tuple is the threshold
+        value at that node. If the first and second tuple elements are the same,
+        they contain a leaf ID.
+     */
+    std::unique_ptr<mu::variant<std::vector<std::tuple<size_t, float, size_t, size_t>>,
+                                std::vector<std::tuple<size_t, double, size_t, size_t>>,
+                                std::vector<std::tuple<size_t, uint32_t, size_t, size_t>>,
+                                std::vector<std::tuple<size_t, uint8_t, size_t, size_t>>>>
+    fast_tree;
     /**
      * A storage for marked nodes that still must to be processed during the
      * tree building process.

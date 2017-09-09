@@ -29,7 +29,7 @@ namespace forpy {
   /// feeding the library with data, all external methods accept either
   /// std::shared_ptr<Eigen::Mat>s if ownership of the data must be set.
   /// That's why the `store` suffixed variants contain shared_ptr's (otherwise
-  /// the data would have to be copied.
+  /// the data would have to be copied).
   ///
   /// In all other cases, the variants contain the data or MatRefs to it
   /// directly for internal library use.
@@ -47,7 +47,7 @@ namespace forpy {
 
   struct Empty{
     template<typename Archive>
-    void serialize(Archive &ar, const uint &) {};
+    void serialize(Archive &, const uint &) {};
     bool operator==(const Empty &) const {return true;};
     float *data() const {return nullptr;};
     friend std::ostream &operator<<(std::ostream &stream, const Empty &) {

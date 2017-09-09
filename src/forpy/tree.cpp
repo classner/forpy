@@ -237,9 +237,15 @@ namespace forpy {
   void Tree::fit(const Data<MatCRef> &data_v,
                  const Data<MatCRef> &annotations,
                  const bool &complete_dfs) {
+#ifdef WITHGPERFTOOLS
+    ProfilerStart("forpy.profile.log");
+#endif
     auto data_provider = std::make_shared<PlainDataProvider>(data_v,
                                                              annotations);
     fit_dprov(data_provider.get(), complete_dfs);
+#ifdef WITHGPERFTOOLS
+    ProfilerStop();
+#endif
   }
 
   void Tree::fit_dprov(IDataProvider *data_provider,
@@ -292,8 +298,8 @@ namespace forpy {
   };
 
   Data<Mat> Tree::predict(const Data<MatCRef> &data_v,
-                          const int &num_threads)
-    const {
+                          const int &num_threads,
+                          const bool &use_fast_prediction_if_available) {
     data_v.match([&](const auto &data) {
         if (static_cast<size_t>(data.cols()) !=
             this->decider->get_data_dim()) {
@@ -310,22 +316,67 @@ namespace forpy {
     {
       Data<Mat> result_v;
       data_v.match([&](const auto &data) {
-          // Predict the first one out-of-place to determine the matrix type.
-          Data<Mat> firstresult_v = this->predict_leaf_result(data.row(0));
-          firstresult_v.match([&](const auto &firstresult) {
-              typedef typename get_core<decltype(firstresult.data())>::type RT;
+          // Determine the result properties.
+          Data<Mat> restype_v = leaf_manager->get_result_type();
+          size_t n_cols = leaf_manager->get_result_columns();
+          restype_v.match([&](const auto &restype) {
+              typedef typename get_core<decltype(restype.data())>::type RT;
               typedef typename get_core<decltype(data.data())>::type IT;
-              result_v.set<Mat<RT>>(data.rows(), firstresult.cols());
+              result_v.set<Mat<RT>>(data.rows(), n_cols);
               auto &result = result_v.get_unchecked<Mat<RT>>();
-              result.row(0) = firstresult;
+              // Initialize fast_tree if necessary.
+              if (fast_tree.get() == nullptr && use_fast_prediction_if_available) {
+                VLOG(9) << "Creating fast tree on the fly.";
+                // Check if fast prediction would be available.
+                bool available = true;
+                const auto *dec = dynamic_cast<ThresholdDecider const *>
+                  (this->decider.get());
+                if (dec == nullptr) {
+                  available = false;
+                }
+                const auto *fc = dynamic_cast<AlignedSurfaceCalculator const *>
+                  (dec->get_featcalc().get());
+                if (fc == nullptr) {
+                  available = false;
+                }
+                if (available) {
+                  this->enable_fast_prediction();
+                }
+              }
               Data<MatCRef> in_v;
               Data<MatRef> out_v;
-              for (size_t i = 1; i < static_cast<size_t>(data.rows()); ++i) {
-                in_v.set<MatCRef<IT>>(data.row(i));
-                out_v.set<MatRef<RT>>(result.row(i));
-                this->leaf_manager->get_result(this->predict_leaf(in_v),
-                                               out_v,
-                                               in_v);
+              if (fast_tree.get() != nullptr) {
+                VLOG(9) << "Using fast tree for predictions.";
+                fast_tree->match([&](const auto &ftree) {
+                    for (size_t i = 0;
+                         i < static_cast<size_t>(data.rows());
+                         ++i) {
+                      // Determine leaf id.
+                      size_t node_id = 0;
+                      while (std::get<2>(ftree[node_id]) != 0) {
+                        if (data(i, std::get<0>(ftree[node_id])) <
+                            std::get<1>(ftree[node_id])) {
+                          node_id = std::get<2>(ftree[node_id]);
+                        } else {
+                          node_id = std::get<3>(ftree[node_id]);
+                        }
+                      }
+                      in_v.set<MatCRef<IT>>(data.row(i));
+                      out_v.set<MatRef<RT>>(result.row(i));
+                      this->leaf_manager->get_result(node_id,
+                                                     out_v,
+                                                     in_v);
+                    }
+                  });
+              } else {
+                for (size_t i = 0; i < static_cast<size_t>(data.rows()); ++i) {
+                  in_v.set<MatCRef<IT>>(data.row(i));
+                  out_v.set<MatRef<RT>>(result.row(i));
+                  //this->predict_leaf(in_v);
+                  this->leaf_manager->get_result(this->predict_leaf(in_v),
+                                                 out_v,
+                                                 in_v);
+                }
               }
             },
             [](const Empty &){});
@@ -401,6 +452,70 @@ namespace forpy {
     return marks;
   }
 
+  void Tree::enable_fast_prediction() {
+    // Check that the tree is trained.
+    if (! this->is_initialized_for_training &&
+          this->tree.size() > 0 &&
+          this->marks.size() == 0) {
+      throw Forpy_Exception("Trying to unpack an untrained tree.");
+    }
+    // Make sure the decider is a threshold decider.
+    const auto *dec = dynamic_cast<ThresholdDecider const *>(this->decider.get());
+    if (dec == nullptr) {
+      throw Forpy_Exception("Unpacking can only be done with a threshold "
+                            "decider.");
+    }
+    // Make sure the feature calculator is an AlignedSurfaceCalculator.
+    const auto *fc = dynamic_cast<AlignedSurfaceCalculator const *>(
+        dec->get_featcalc().get());
+    if (fc == nullptr) {
+      throw Forpy_Exception("Unpacking can only be done with an "
+                            "AlignedSurfaceCalculator.");
+    }
+    if (fast_tree.get() != nullptr) {
+      throw Forpy_Exception("This tree has been unpacked before!");
+    }
+    // Everything ok, start unpacking.
+    auto maps = dec->get_maps();
+    const auto &tree_map = *(maps.first);
+    const auto &threshold_map_v = *(maps.second);
+    VLOG(9) << "Unpacking " << tree.size() << " nodes for fast prediction.";
+    threshold_map_v.match([&](const auto &threshold_map) {
+        fast_tree = std::make_unique<mu::variant<std::vector<std::tuple<size_t, float, size_t, size_t>>,
+                                                 std::vector<std::tuple<size_t, double, size_t, size_t>>,
+                                                 std::vector<std::tuple<size_t, uint32_t, size_t, size_t>>,
+                                                 std::vector<std::tuple<size_t, uint8_t, size_t, size_t>>>>();
+        typedef decltype(threshold_map.begin()->second) thresh_t;
+        FASSERT(tree_map.size() == threshold_map.size());
+        // Find the maximum node id in the tree map.
+        fast_tree->set<std::vector<std::tuple<size_t, thresh_t, size_t, size_t>>>
+          (tree.size(),
+           std::make_tuple(0, static_cast<thresh_t>(0), 0, 0));
+        auto &ftree = fast_tree->get_unchecked<std::vector<std::tuple<size_t, thresh_t, size_t, size_t>>>();
+        for (size_t node_id = 0; node_id < tree.size(); ++node_id) {
+          const auto &node_id_pair = tree[node_id];
+          if (node_id_pair.first == 0 || node_id_pair.second == 0) {
+            // Leaf.
+            // Leave them zeros.
+            continue;
+          }
+          ftree[node_id] = std::make_tuple(tree_map.at(node_id)[0],
+                                           threshold_map.at(node_id),
+                                           node_id_pair.first,
+                                           node_id_pair.second);
+        }
+      },
+      [](const Empty &) { throw Forpy_Exception("Received empty threshold map!"); });
+    VLOG(9) << "Unpacking done.";
+  };
+
+  void Tree::disable_fast_prediction() {
+    VLOG(9) << "Disabling fast prediction; freeing memory.";
+    fast_tree.reset();
+  }
+
+  Tree::Tree() {};
+
   bool Tree::operator==(Tree const &rhs) const {
     bool eq_depth = max_depth == rhs.max_depth;
     bool eq_init = is_initialized_for_training == rhs.is_initialized_for_training;
@@ -440,7 +555,5 @@ namespace forpy {
     }
     fstream.close();
   }
-
-  Tree::Tree() {};
 
 } // namespace forpy
