@@ -10,7 +10,6 @@ addons:
     packages:
       - g++-6
       - clang-3.8
-      - ninja
       - python-pip
       - python-numpy
       - python-scipy
@@ -19,7 +18,6 @@ install:
   - "[ $CXX = g++ ] && export CXX=g++-6 || true"
   - "[ $CXX = clang++ && export CXX=clang++-3.8 || true"
 script:
-  - build_support/travis/setup_cmake.sh
   - pip install --user scikit-build
   - python setup.py install
 test:
