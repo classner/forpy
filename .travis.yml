@@ -19,6 +19,6 @@ install:
   - "[ $CXX = clang++ && export CXX=clang++-3.8 || true"
 script:
   - pip install --user scikit-build
-  - python setup.py install
+  - python setup.py install --user
 test:
   - python setup.py test

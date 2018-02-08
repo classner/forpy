@@ -105,9 +105,9 @@ class ILeaf {
           typedef typename get_core<decltype(lr0.data())>::type RT;
           ret.set<Mat<RT>>(Mat<RT>::Zero(
               lr0.rows(),
-              get_result_columns(leaf_results.size(), predict_proba, false)));
+              this->get_result_columns(leaf_results.size(), predict_proba, false)));
           Data<MatRef> dref = MatRef<RT>(ret.get_unchecked<Mat<RT>>());
-          get_result(leaf_results, dref, weights, predict_proba);
+          this->get_result(leaf_results, dref, weights, predict_proba);
         },
         [&](const Empty &) { throw EmptyException(); });
     return ret;

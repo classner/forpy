@@ -43,7 +43,7 @@ class IEntropyFunction {
                       fsum);
   };
 
-  inline virtual float operator()(const float *class_members_numbers,
+  virtual float operator()(const float *class_members_numbers,
                                   const size_t &n, const float &fsum) const
       VIRTUAL(float);
 

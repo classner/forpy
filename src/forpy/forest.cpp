@@ -110,14 +110,14 @@ Forest *Forest::fit(const Data<MatCRef> &data_v,
                     weights.size() == 0
                         ? nullptr
                         : std::make_shared<std::vector<float>>(weights));
-                fit_dprov(data_provider, bootstrap);
+                this->fit_dprov(data_provider, bootstrap);
               } else {
                 auto data_provider = std::make_shared<FastDProv>(
                     data_v, annotations_v,
                     weights.size() == 0
                         ? nullptr
                         : std::make_shared<std::vector<float>>(weights));
-                fit_dprov(data_provider, bootstrap);
+                this->fit_dprov(data_provider, bootstrap);
               }
             },
             [&](const Empty &) { throw EmptyException(); });
