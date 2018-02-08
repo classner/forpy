@@ -2,8 +2,7 @@
 #ifndef FORPY_UTIL_SERIALIZATION_EIGEN_H_
 #define FORPY_UTIL_SERIALIZATION_EIGEN_H_
 
-#include <cereal/archives/portable_binary.hpp>
-#include <cereal/archives/json.hpp>
+#include "./basics.h"
 
 #include <Eigen/Dense>
 #include "../../global.h"

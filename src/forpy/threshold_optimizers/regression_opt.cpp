@@ -188,8 +188,8 @@ inline std::unique_ptr<std::vector<float>> RegressionOpt::optimize__thresholds(
 
 void RegressionOpt::optimize(Desk *desk) const {
   DeciderDesk &d = desk->d;  // Solely for convenience.
-  SplitOptRes<float> &ret_res = optimize__setup(d);
-  optimize__sort(d);
+  SplitOptRes<float> &ret_res = this->optimize__setup(d);
+  this->optimize__sort(d);
   float *feat_p = d.feat_p;  // The analyzed feature, only samples at this node.
   size_t n_samples = d.n_samples;
   if (feat_p[n_samples - 1] - feat_p[0] <= REGOPT_EPS) {
@@ -198,7 +198,7 @@ void RegressionOpt::optimize(Desk *desk) const {
         << "Not optimizing because min and max features are too close!";
     return;
   }
-  std::unique_ptr<std::vector<float>> thresholds = optimize__thresholds(desk);
+  std::unique_ptr<std::vector<float>> thresholds = this->optimize__thresholds(desk);
   std::vector<float>::const_iterator feat_val_it;
   if (n_thresholds > 0) feat_val_it = thresholds->begin();
   id_t *elem_id_p = d.elem_id_p;  // The element IDs are global. The pointer

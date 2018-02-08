@@ -139,8 +139,8 @@ void FastClassOpt::optimize(Desk *desk) const {
   d.class_feat_values.match([&](auto &class_feats) {
     typedef typename get_core<decltype(class_feats.data())>::type IT;
     IT *feat_p = &class_feats[0];
-    SplitOptRes<IT> &ret_res = optimize__setup<IT>(d);
-    optimize__sort<IT>(d);
+    SplitOptRes<IT> &ret_res = this->optimize__setup<IT>(d);
+    this->optimize__sort<IT>(d);
     size_t n_samples = d.n_samples;
     if (feat_p[n_samples - 1] - feat_p[0] <= CLASSOPT_EPS) {
       DLOG_IF(INFO, DLOG_FCOPT_V >= 1 &&
@@ -149,7 +149,7 @@ void FastClassOpt::optimize(Desk *desk) const {
       return;
     }
     std::unique_ptr<std::vector<IT>> thresholds =
-        optimize__thresholds<IT>(desk);
+        this->optimize__thresholds<IT>(desk);
     typename std::vector<IT>::const_iterator feat_val_it;
     if (n_thresholds > 0) feat_val_it = thresholds->begin();
     id_t *elem_id_p = d.elem_id_p;  // The element IDs are global. The pointer

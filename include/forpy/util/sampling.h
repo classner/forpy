@@ -12,7 +12,7 @@
 #include <vector>
 
 #include "../global.h"
-#include "./serialization/serialization.h"
+#include "./serialization/basics.h"
 
 namespace forpy {
 /**
