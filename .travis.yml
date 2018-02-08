@@ -2,9 +2,6 @@ language: cpp
 compiler:
   - gcc
   - clang
-python:
-  - "2.7"
-  - "3.6"
 addons:
   apt:
     sources:
@@ -14,6 +11,7 @@ addons:
       - g++-6
       - clang-3.8
       - cmake
+      - python-pip
       - python-numpy
       - python-scipy
       - python-matplotlib
