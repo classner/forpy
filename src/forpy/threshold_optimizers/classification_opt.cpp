@@ -208,9 +208,9 @@ inline std::unique_ptr<std::vector<IT>> ClassificationOpt::optimize__thresholds(
         std::min<size_t>(n_thresholds_capped, desk->d.n_samples);
     FASSERT(n_thresholds_capped >= 1);
     auto retvec_up = std::make_unique<std::vector<IT>>(n_thresholds_capped);
-    std::uniform_real_distribution<IT> udist(minval, maxval);
+    std::uniform_real_distribution<float> udist(minval, maxval);
     for (size_t i = 0; i < n_thresholds_capped; ++i)
-      retvec_up->at(i) = udist(desk->r.random_engine);
+      retvec_up->at(i) = static_cast<IT>(udist(desk->r.random_engine));
     ska_sort(retvec_up->begin(), retvec_up->end());
     return retvec_up;
   }
