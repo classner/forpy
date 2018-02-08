@@ -1,0 +1,26 @@
+language: cpp
+compiler:
+  - gcc
+  - clang
+python:
+  - "2.7"
+  - "3.6"
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+      - llvm-toolchain-precise-3.8
+    packages:
+      - g++-6
+      - clang-3.8
+      - cmake
+      - python-numpy
+      - python-scipy
+      - python-matplotlib
+install:  
+  - "[ $CXX = g++ ] && export CXX=g++-6 || true"
+  - "[ $CXX = clang++ && export CXX=clang++-3.8 || true"
+script:
+  - python setup.py install
+test:
+  - python setup.py test
