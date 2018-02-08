@@ -21,5 +21,4 @@ install:
 script:
   - pip install --user scikit-build
   - python setup.py install --user
-test:
   - python setup.py test
