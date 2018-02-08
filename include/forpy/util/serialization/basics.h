@@ -6,6 +6,7 @@
 #include <cereal/archives/portable_binary.hpp>
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunused-private-field"
+#pragma clang diagnostic ignored "-Wexceptions"
 #include <cereal/archives/json.hpp>
 #pragma clang diagnostic pop
 #include <cereal/access.hpp>

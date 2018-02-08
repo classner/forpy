@@ -10,15 +10,15 @@ FastDProv::FastDProv(
       weights_store(weights_store) {
   if (weights_store != nullptr && weights_store->size() == 0)
     this->weights_store = nullptr;
-  data_store.match([](const Empty &) { throw EmptyException(); },
+  data_store.match([&, this](const Empty &) { throw EmptyException(); },
                    [&, this](const auto &data) {
                      annotation_store.match(
                          [](const Empty &) { throw EmptyException(); },
                          [&, this](const auto &annotations) {
                            this->data = *data;
                            this->annotations = *annotations;
-                           checks(*data, *annotations);
-                           init_from_arrays();
+                           this->checks(*data, *annotations);
+                           this->init_from_arrays();
                          });
                    });
 };
