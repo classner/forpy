@@ -19,7 +19,7 @@ install:
   - "[ $CXX = g++ ] && export CXX=g++-6 || true"
   - "[ $CXX = clang++ && export CXX=clang++-3.8 || true"
 script:
-  - pip install scikit-build
+  - pip install --user scikit-build
   - python setup.py install
 test:
   - python setup.py test
