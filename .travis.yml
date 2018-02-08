@@ -7,10 +7,12 @@ addons:
     sources:
       - ubuntu-toolchain-r-test
       - llvm-toolchain-precise-3.8
+      - kalakris-cmake
     packages:
       - g++-6
       - clang-3.8
       - cmake
+      - ninja
       - python-pip
       - python-numpy
       - python-scipy
