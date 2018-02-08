@@ -14,7 +14,13 @@ endif()
 set_target_properties(forpy_core PROPERTIES
   COTIRE_PREFIX_HEADER_INCLUDE_PATH
   "${CMAKE_SOURCE_DIR}/build_support/external")
+if (NOT PCH_ENABLED)
+  set_target_properties(forpy_core PROPERTIES COTIRE_ENABLE_PRECOMPILED_HEADER FALSE)
+endif()
 cotire (forpy_core)
+add_custom_command (
+  OUTPUT "forpy_core_CXX_cotire.cmake" PRE_BUILD
+  COMMENT "Noop proxy for ninja about the cotire generated PCHs.")
 
 install (TARGETS forpy_core DESTINATION lib)
 if (WITH_PYTHON)

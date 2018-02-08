@@ -1,67 +1,42 @@
-#include "./forpy_exporters.h"
-#include <Eigen/Dense>
 #include <forpy/impurities/impurities.h>
+#include <Eigen/Dense>
 #include "./conversion.h"
+#include "./forpy_exporters.h"
 
 namespace py = pybind11;
 
 namespace forpy {
 
-void export_impurities_impl(py::module &m, const std::string &suff) {
-  py::class_<IEntropyFunction,
-             std::shared_ptr<IEntropyFunction>> ieff(
-     m, ("IEntropyFunction" + suff).c_str());
-  ieff.def("__eq__", [](const IEntropyFunction &a,
-                        const IEntropyFunction &b) { return a == b; },
+void export_impurities(py::module &m) {
+  FORPY_EXPCLASS_EQ(IEntropyFunction, ieff);
+  ieff.def("__call__",
+           [](const IEntropyFunction &ef, const std::vector<float> &a) {
+             return ef(a);
+           },
            py::is_operator());
-  ieff.def("__ne__", [](const IEntropyFunction &a,
-                        const IEntropyFunction &b) { return !(a == b); },
-           py::is_operator());
-  ieff.def("__call__", [](const IEntropyFunction &ef,
-                          const std::vector<float> &a) { return ef(a); },
-           py::is_operator());
-  ieff.def("differential_normal",
-           [](const IEntropyFunction &ef,
-              const MatCRef<float>& in) {
-             return ef.differential_normal(in);
-           });
-    
-  py::class_<ShannonEntropy, std::shared_ptr<ShannonEntropy>> se(
-      m,
-      ("ShannonEntropy" + suff).c_str(),
-      ieff);
+
+  FORPY_EXPCLASS_PARENT(ShannonEntropy, se, ieff);
   se.def(py::init<>());
+  FORPY_DEFAULT_REPR(se, ShannonEntropy);
 
-  py::class_<ClassificationError, std::shared_ptr<ClassificationError>>
-             ce(m,
-                ("ClassificationError" + suff).c_str(),
-                ieff);
+  FORPY_EXPCLASS_PARENT(ClassificationError, ce, ieff);
   ce.def(py::init<>());
+  FORPY_DEFAULT_REPR(ce, ClassificationError);
 
-  py::class_<InducedEntropy, std::shared_ptr<InducedEntropy>>
-             ie(m,
-                ("InducedEntropy" + suff).c_str(),
-                ieff);
+  FORPY_EXPCLASS_PARENT(InducedEntropy, ie, ieff);
   ie.def(py::init<float>());
   ie.def_property_readonly("get_p", &InducedEntropy::get_p);
+  FORPY_DEFAULT_REPR(ie, InducedEntropy);
 
-  py::class_<TsallisEntropy, std::shared_ptr<TsallisEntropy>>
-             te(m,
-                ("TsallisEntropy" + suff).c_str(),
-                ieff);
+  FORPY_EXPCLASS_PARENT(TsallisEntropy, te, ieff);
   te.def(py::init<float>());
   te.def_property_readonly("get_q", &TsallisEntropy::get_q);
+  FORPY_DEFAULT_REPR(te, TsallisEntropy);
 
-  py::class_<RenyiEntropy, std::shared_ptr<RenyiEntropy>>
-             re(m,
-                ("RenyiEntropy" + suff).c_str(),
-                ieff);
+  FORPY_EXPCLASS_PARENT(RenyiEntropy, re, ieff);
   re.def(py::init<float>());
-  re.def_property_readonly("get_alpha", &RenyiEntropy::get_alpha); 
+  re.def_property_readonly("get_alpha", &RenyiEntropy::get_alpha);
+  FORPY_DEFAULT_REPR(re, RenyiEntropy);
 };
+
 }  // namespace forpy
-
-
-void forpy::export_impurities(py::module &m) {
-  export_impurities_impl(m, "");
-};

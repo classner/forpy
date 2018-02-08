@@ -45,7 +45,7 @@ struct DualMemberNumberFixture {
     }
   };
 };
-/*
+
 template <typename T>
 struct EntropyGainFixture {
   std::shared_ptr<forpy::IGainCalculator<T>> egain;

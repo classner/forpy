@@ -1,7 +1,10 @@
 ExternalProject_Add (glog
   PREFIX "${CMAKE_CURRENT_BINARY_DIR}/glog"
-  SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/glog-v0.3.5"
+  # Just providing a SOURCE_DIR doesn't seem to work for all builders (e.g.,
+  # ninja) and I want to include all dependencies.
+  DOWNLOAD_COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR} && cp -r ${CMAKE_CURRENT_SOURCE_DIR}/glog-v0.3.5/ ${CMAKE_CURRENT_BINARY_DIR}/glog/src/glog-build
   CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR> -DWITH_GFLAGS=Off
+  OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/glog/lib/libglog.a"
 )
 ExternalProject_Get_Property(glog install_dir)
 set (GLOG_BINARY  "${CMAKE_CURRENT_BINARY_DIR}/glog/lib/libglog.a" PARENT_SCOPE)

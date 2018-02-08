@@ -2,6 +2,10 @@
 #define VARIANT_CAST_HPP
 
 #include <type_traits>
+#include <typeinfo>
+
+#include <mapbox/variant.hpp>
+#include <mapbox/variant_visitor.hpp>
 
 namespace mapbox {
 namespace util {
@@ -11,7 +15,7 @@ namespace detail {
 template <class T>
 class static_caster
 {
-public:
+  public:
     template <class V>
     T& operator()(V& v) const
     {
@@ -22,10 +26,10 @@ public:
 template <class T>
 class dynamic_caster
 {
-public:
+  public:
     using result_type = T&;
     template <class V>
-    T& operator()(V& v, typename std::enable_if<!std::is_polymorphic<V>::value>::type* = nullptr) const
+    T& operator()(V& /*v*/, typename std::enable_if<!std::is_polymorphic<V>::value>::type* = nullptr) const
     {
         throw std::bad_cast();
     }
@@ -39,10 +43,10 @@ public:
 template <class T>
 class dynamic_caster<T*>
 {
-public:
+  public:
     using result_type = T*;
     template <class V>
-    T* operator()(V& v, typename std::enable_if<!std::is_polymorphic<V>::value>::type* = nullptr) const
+    T* operator()(V& /*v*/, typename std::enable_if<!std::is_polymorphic<V>::value>::type* = nullptr) const
     {
         return nullptr;
     }
@@ -52,7 +56,7 @@ public:
         return dynamic_cast<T*>(&v);
     }
 };
-}
+} // namespace detail
 
 template <class T, class V>
 typename detail::dynamic_caster<T>::result_type
@@ -79,7 +83,7 @@ const T& static_variant_cast(const V& v)
 {
     return mapbox::util::apply_visitor(detail::static_caster<const T>(), v);
 }
-}
-}
+} // namespace util
+} // namespace mapbox
 
 #endif // VARIANT_CAST_HPP

@@ -1,2 +1,2 @@
+#include "./fastdecider.h"
 #include "./idecider.h"
-#include "./thresholddecider.h"

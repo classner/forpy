@@ -11,3 +11,8 @@ test/python/test.ft
 build_support/external/glog/glog-v0.3.5/test-driver
 build_*
 *callgrind*
+test/python/timings_dset.png
+test/python/timings_n_annots.png
+test/python/timings_n_features.png
+test/python/timings_n_threads.png
+.*_cache

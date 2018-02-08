@@ -8,9 +8,6 @@
 #include "../global.h"
 
 namespace forpy {
-  /** Precomputed value for the calculation of log2. */
-  static const float LOG2VAL = logf(2.f);
-
   /** Portable double pi value. */
   static const double D_PI = 4. * atan(1.);
 
@@ -18,10 +15,12 @@ namespace forpy {
    * entropy. */
   static const float TWO_PI = static_cast<float>(2. * D_PI);
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-variable"
   /** Precomputed value for the computation of the differential
    * shannon entropy. */
   static const float TWO_PI_E = TWO_PI * expf(1.f);
-
+#pragma clang diagnostic pop
   /**
    * \brief Computes an int power by an int.
    *

@@ -3,138 +3,127 @@
 #ifndef FORPY_DATA_PROVIDERS_IDATAPROVIDER_H_
 #define FORPY_DATA_PROVIDERS_IDATAPROVIDER_H_
 
-#include <cereal/access.hpp>
+#include "../global.h"
+#include "../util/serialization/basics.h"
 
 #include <functional>
 #include <vector>
 
-#include "../global.h"
 #include "../types.h"
-#include "./sample.h"
 #include "../util/storage.h"
 
 namespace forpy {
+
+/**
+ * \brief A data provider for the training of one tree.
+ *
+ * \ingroup forpydata_providersGroup
+ */
+class IDataProvider {
+ public:
+  inline virtual ~IDataProvider(){};
+
   /**
-   * \brief The data provider for the training of one tree.
+   * \brief Get a sample id list of samples for the root node.
    *
-   * \ingroup forpydata_providersGroup
-   *
-   * Data providers work with \ref Samples and sample ids. They are allowed to
-   * add additional samples during training on the fly. The method
-   * \ref optimize_set_for_node is called before a classifier is fitted for
-   * a decision node, so that the data provider can alter the set of samples
-   * that are used.
+   * Not all samples have to be used for trees, so this list can be sparse
+   * and/or unordered.
    */
-  class IDataProvider {
-   public:
-    virtual ~IDataProvider();
+  virtual std::vector<id_t> &get_initial_sample_list()
+      VIRTUAL(std::vector<id_t>);
 
-    /**
-      * \brief Optimizes a sample set.
-      *
-      * This method is called before classifier optimization at every node.
-      *
-      * \param node_id The current nodes id.
-      * \param depth The node's depth.
-      * \param node_predictor A function that takes a sample and returns the
-      *                       node id of the node in the current tree at which
-      *                       the sample would arrive.
-      * \param element_list The id list of all elements that arrive at the
-      *                     node.
-      */
-    virtual void optimize_set_for_node(
-      const node_id_t &node_id,
-      const uint &depth,
-      const node_predf &node_predictor,
-      const elem_id_vec_t &element_list) VIRTUAL_VOID;
+  /** \brief Get the number of samples. */
+  virtual size_t get_n_samples() const VIRTUAL_VOID;
 
-    /**
-      * \brief Get a sample id list of samples for the root node.
-      */
-    virtual const elem_id_vec_t &get_initial_sample_list() const
-      VIRTUAL(elem_id_vec_t);
+  /**
+   * \brief Get the data for one feature from all samples, contiguously in
+   * memory (stride 1).
+   */
+  virtual Data<VecCMap> get_feature(const size_t & /*feat_idx*/) const {
+    throw ForpyException("`get_feature` not implemented!");
+  };
 
-    /**
-      * \brief Get all samples.
-      */
-    virtual const SampleVec<Sample> &get_samples() const
-      VIRTUAL(SampleVec<Sample>);
+  /**
+   * \brief Get the full annotation data (must have inner stride 1).
+   */
+  virtual Data<MatCRef> get_annotations() const {
+    throw ForpyException("`get_annotations` not implemented!");
+  };
 
-    /**
-     * \brief Some data providers might need this method to do cleanup actions
-     * for efficient sample data management.
-     */
-    virtual void track_child_nodes(node_id_t node_id,
-      node_id_t left_id, node_id_t right_id) VIRTUAL_VOID;
+  /**
+   * \brief Replace the annotations.
+   *
+   * Do not use this during ongoing training since there is no currently
+   * implemented mechanism to update the pointers to annotations in the various
+   * processing threads.
+   *
+   * The method is currently used to store reduced class number lists for
+   * classification (see \ref forpy::ClassificationOpt::check_annotations).
+   */
+  virtual void set_annotations(const DataStore<Mat> &new_annotations)
+      VIRTUAL_VOID;
 
-    /**
-     * \brief Returns one feature vector dimension.
-     */
-    size_t get_feat_vec_dim() const;
+  /**
+   * \brief Get a pointer to the sample weights.
+   *
+   * Can be a nullptr, in that case no weights were provided.
+   */
+  virtual std::shared_ptr<const std::vector<float>> get_weights() const
+      VIRTUAL_PTR;
 
-    /**
-     * \brief Returns one annotation vector dimension.
-     */
-    size_t get_annot_vec_dim() const;
+  /**
+   * \brief Get the feature vector dimension.
+   */
+  inline size_t get_feat_vec_dim() const { return feat_vec_dim; };
 
-    /** 
-     * \brief Returns a coordinate transformation function for the dimension
-     * selectors.
-     *
-     * The transformation is applied to the positions before the data is
-     * extracted and passed to the IFeatureCalculator. If not overridden,
-     * returns the nullptr (no transformation).
-     */
-    virtual std::function<void(void*)> get_decision_transf_func(
-                                                         const element_id_t &)
-      const;
+  /**
+   * \brief Get the annotation vector dimension.
+   */
+  inline size_t get_annot_vec_dim() const { return annot_vec_dim; };
 
-    /**
-     * \brief Gives the data provider the opportunity to load all samples
-     * to construct a leaf.
-     *
-     * This method is especially important for the subsampling data providers:
-     * only a certain amount of samples is used to find a good split, but
-     * if the result is a leaf node, ALL samples should be used to create
-     * a good leaf estimate.
-     */
-    virtual void load_samples_for_leaf(
-        const node_id_t &node_id,
-        const node_predf &node_predictor,
-        elem_id_vec_t *element_list);
-
-    /**
-     * \brief Creates the data providers for each tree from the specified
-     *        usage map.
-     *
-     * \param n How many data providers (trees) are needed.
-     * \param usage_map A vector with a pair of sample_id lists. Each vector
-     *    element is for one tree. It contains a pair of training ids and
-     *    validation ids of the samples to use.
-     */
-    virtual std::vector<std::shared_ptr<IDataProvider>> create_tree_providers(
-        const usage_map_t &usage_map)
+  /**
+   * \brief Creates the data providers for each tree from the specified
+   *        usage map.
+   *
+   * This brings some tricky issues concerning data ownership in: since
+   * internally this method will construct other data providers not owning
+   * their data, this must be communicated to the user who constructed this
+   * object non-owning data. Hence, the resulting data providers must keep this
+   * object `alive` if this method is called from Python, and all Python users
+   * of a data provider must keep it alive as long as they use it.
+   *
+   * \param usage_map A vector with sample_id lists.
+   */
+  virtual std::vector<std::shared_ptr<IDataProvider>> create_tree_providers(
+      usage_map_t &usage_map)
       VIRTUAL(std::vector<std::shared_ptr<IDataProvider>>);
 
-    virtual bool operator==(const IDataProvider &rhs) const VIRTUAL(bool);
+  virtual bool operator==(const IDataProvider &rhs) const VIRTUAL(bool);
 
-   protected:
-    explicit IDataProvider(const size_t &feature_dimension,
-                           const size_t &annotation_dimension);
+ protected:
+  /**
+   * \brief Standard constructor to use for inheriting classes.
+   */
+  explicit IDataProvider(const size_t &feature_dimension,
+                         const size_t &annotation_dimension);
 
-    // cppcheck-suppress uninitVar
-    IDataProvider();
+  /**
+   * \brief Constructor solely for deserialization.
+   */
+  // cppcheck-suppress uninitVar
+  inline IDataProvider(){};
 
-    friend class cereal::access;
-    template<class Archive>
-    void serialize(Archive & ar, const uint &) {
-      ar(CEREAL_NVP(feat_vec_dim),
-         CEREAL_NVP(annot_vec_dim));
-    }
+  /** \brief The dimension of one feature vector. */
+  size_t feat_vec_dim;
+  /** \brief The dimension of one annotation vector. */
+  size_t annot_vec_dim;
 
-    /** \brief The dimension of one sample vector. */
-    size_t feat_vec_dim;
-    size_t annot_vec_dim;
-  };
+ private:
+  friend class cereal::access;
+  template <class Archive>
+  void serialize(Archive &ar, const uint &) {
+    ar(CEREAL_NVP(feat_vec_dim), CEREAL_NVP(annot_vec_dim));
+  }
+};
 }  // namespace forpy
 #endif  // FORPY_DATA_PROVIDERS_IDATAPROVIDER_H_

@@ -1,7 +1,0 @@
-#include "./ifeatureproposer.h"
-#include "./featureproposer.h"
-#include "./ifeatureselector.h"
-#include "./featureselector.h"
-#include "./featcalcparams.h"
-#include "./isurfacecalculator.h"
-#include "./alignedsurfacecalculator.h"
