@@ -114,7 +114,7 @@ class ILeaf {
   };
 
   /** \brief Get the fused forest result. */
-  inline virtual void get_result(
+  virtual void get_result(
       const std::vector<Data<Mat>> &leaf_results, Data<MatRef> &target_v,
       const Vec<float> &weights = Vec<float>(),
       const bool &predict_proba = false) const VIRTUAL_VOID;

@@ -26,6 +26,7 @@ void RegressionOpt::check_annotations(IDataProvider *dprov) {
     }
   }
   annotation_v.match(
+      [](const Empty &) { throw EmptyException(); },
       [](const auto &annotations) {
         typedef typename get_core<decltype(annotations.data())>::type AT;
         if (typeid(AT) != typeid(float)) {
@@ -38,10 +39,11 @@ void RegressionOpt::check_annotations(IDataProvider *dprov) {
               "The annotation data must have inner stride 1 (has " +
               std::to_string(annotations.innerStride()) + ")!");
         }
-      },
-      [](const Empty &) { throw EmptyException(); });
+      });
   const auto &data_v = dprov->get_feature(0);
-  data_v.match([](const auto &data) {
+  data_v.match(
+    [](const Empty &) { throw EmptyException(); },
+    [](const auto &data) {
     typedef typename get_core<decltype(data.data())>::type IT;
     if (typeid(IT) != typeid(float)) {
       throw ForpyException(
