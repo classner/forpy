@@ -61,12 +61,6 @@ set (REQ_CPP11_FEATURES
 # Use optimizations.
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftree-vectorize -ffast-math")
 
-# Check for OpenMP support.
-find_package (OpenMP)
-if (OPENMP_FOUND)
-  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-endif ()
-
 # Fix clang warnings.
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-tautological-compare -Wno-logical-op-parentheses -Wno-deprecated-register -Wno-comment")

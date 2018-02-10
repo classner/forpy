@@ -2,7 +2,10 @@
 #ifndef FORPY_UTIL_STORAGE_H_
 #define FORPY_UTIL_STORAGE_H_
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wreturn-local-addr"
 #include <mapbox/variant_cast.hpp>
+#pragma GCC diagnostic pop
 #include "./serialization/variant.h"
 
 namespace forpy {
@@ -57,7 +60,15 @@ struct Empty {
   template <typename Archive>
   void serialize(Archive &, const uint &){};
   bool operator==(const Empty &) const { return true; };
-  float *data() const { return nullptr; };
+  float *data() const {
+    throw ForpyException("Trying to access an empty data storage.");
+    return nullptr; };
+  size_t &innerStride() const {
+    throw ForpyException("Trying to access an empty data storage.");
+  };
+  size_t &outerStride() const {
+    throw ForpyException("Trying to access an empty data storage.");
+  };
   friend std::ostream &operator<<(std::ostream &stream, const Empty &) {
     stream << "forpy::Empty";
     return stream;
