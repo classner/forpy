@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 """Test leaf storage."""
 import os.path as path
 import sys
