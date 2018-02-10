@@ -2,6 +2,14 @@ language: cpp
 compiler:
   - gcc
   - clang
+os:
+  - osx
+  - linux
+osx_image: xcode9.2
+matrix:
+  exclude:
+    - os: osx
+      compiler: gcc
 addons:
   apt:
     sources:
@@ -16,8 +24,9 @@ addons:
       - python-matplotlib
       - python-tornado
 install:  
-  - "[ $CXX = g++ ] && export CXX=g++-6 || true"
-  - "[ $CXX = clang++ && export CXX=clang++-3.8 || true"
+  - "[ ${TRAVIS_OS_NAME} = 'linux' && ${CXX} = g++ ] && export CXX=g++-6 || true"
+  - "[ ${TRAVIS_OS_NAME} = 'linux' && ${CXX} = clang++ ] && export CXX=clang++-3.8 || true"
+  - "[ ${TRAVIS_OS_NAME} = 'osx' ] && pip install --user scikit-build matplotlib || true"
 script:
   - pip install --user scikit-build
   - python setup.py install --user

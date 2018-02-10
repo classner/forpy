@@ -61,6 +61,8 @@ set (REQ_CPP11_FEATURES
    # Use optimizations.
 if (NOT WIN32)
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftree-vectorize -ffast-math")
+else ()
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++latest")
 endif ()
 
 # Fix clang warnings.
