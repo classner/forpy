@@ -1,10 +1,12 @@
 if (WIN32)
+  STRING(REGEX REPLACE "\\\\" "/" CURR_BIN_DIR ${CMAKE_CURRENT_BINARY_DIR})
+  STRING(REGEX REPLACE "\\\\" "/" CURR_SRC_DIR ${CURRENT_SOURCE_DIR})
   ExternalProject_Add (glog
     PREFIX "${CMAKE_CURRENT_BINARY_DIR}/glog"
     # Just providing a SOURCE_DIR doesn't seem to work for all builders (e.g.,
     # ninja) and I want to include all dependencies.
-    DOWNLOAD_COMMAND mkdir ${CMAKE_CURRENT_BINARY_DIR}
-    UPDATE_COMMAND xcopy ${CMAKE_CURRENT_SOURCE_DIR}/glog-build ${CMAKE_CURRENT_BINARY_DIR}/glog/src /e
+    DOWNLOAD_COMMAND mkdir ${CURR_BIN_DIR}
+    UPDATE_COMMAND xcopy ${CURR_SRC_DIR}\\glog-build ${CURR_BIN_DIR}\\glog\\src /e
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR> -DWITH_GFLAGS=Off
     OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/glog/lib/libglog.lib"
     )

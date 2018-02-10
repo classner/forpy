@@ -120,8 +120,6 @@ add_subdirectory ("bindings/python")
 add_subdirectory ("test")
 
 enable_testing()
-# Create the examples.
-#add_subdirectory (examples/c++)
 
 # Create the documentation.
 add_subdirectory (docs)
