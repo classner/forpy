@@ -125,7 +125,7 @@ enable_testing()
 
 # Create the documentation.
 add_subdirectory (docs)
-get_directory_property(DOXYGEN_FOUND DIRECTORY doc DEFINITION DOXYGEN_FOUND)
+get_directory_property(DOXYGEN_FOUND DIRECTORY docs DEFINITION DOXYGEN_FOUND)
 
 # Summarize.
 message ("--------------------------------------------------------------------")
