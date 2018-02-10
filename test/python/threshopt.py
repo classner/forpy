@@ -145,7 +145,7 @@ class TestThreshopt(unittest.TestCase):
         res = rto.optimize(self.pdp_w, 0)
         self.assertEqual(res.split_idx, 15)
         self.assertEqual(res.thresh, 72.5)
-        self.assertAlmostEqual(res.gain, 0.14957934617996216)
+        self.assertAlmostEqual(res.gain, 0.14957934617996216, places=6)
         self.assertEqual(res.valid, True)
 
     def test_fast_class_opt(self):
