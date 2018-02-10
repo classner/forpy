@@ -322,14 +322,14 @@ Tree *Tree::fit(const Data<MatCRef> &data_v, const Data<MatCRef> &annotations_v,
                     weights.size() == 0
                         ? nullptr
                         : std::make_shared<std::vector<float>>(weights));
-                fit_dprov(data_provider, complete_dfs);
+                this->fit_dprov(data_provider, complete_dfs);
               } else {
                 auto data_provider = std::make_shared<FastDProv>(
                     data_v, annotations_v,
                     weights.size() == 0
                         ? nullptr
                         : std::make_shared<std::vector<float>>(weights));
-                fit_dprov(data_provider, complete_dfs);
+                this->fit_dprov(data_provider, complete_dfs);
               }
             },
             [&](const Empty &) { throw EmptyException(); });
@@ -370,7 +370,7 @@ Tree *Tree::fit_dprov(std::shared_ptr<IDataProvider> data_provider,
   FASSERT(sample_ids->size() > 0);
   TodoMark mark(sample_ids, interv_t(0, sample_ids->size()), next_id++, 0);
   is_initialized_for_training = true;
-  if (complete_dfs) parallel_DFS(nullptr, mark, data_provider.get());
+  if (complete_dfs) this->parallel_DFS(nullptr, mark, data_provider.get());
   return this;
 };
 
