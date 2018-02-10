@@ -7,8 +7,7 @@ if (WIN32)
     PREFIX ${PREF_DIR}
     # Just providing a SOURCE_DIR doesn't seem to work for all builders (e.g.,
     # ninja) and I want to include all dependencies.
-    DOWNLOAD_COMMAND mkdir ${CURR_BIN_DIR}
-    UPDATE_COMMAND xcopy ${CURR_SRC_DIR}\\glog-build ${CURR_BIN_DIR}\\glog\\src /e
+    DOWNLOAD_COMMAND xcopy ${CURR_SRC_DIR}\\glog-build ${CURR_BIN_DIR}\\glog\\src /e
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR> -DWITH_GFLAGS=Off
     OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/glog/lib/libglog.lib"
     )
