@@ -17,8 +17,19 @@ cache:
   - directories:
     - $HOME/.pyenv_cache
 before_install:
-  - "[ ${TRAVIS_OS_NAME} = 'linux' ] && export CXX=g++-6 || true"
-  - cd /opt/pyenv && git pull && cd -
+  - |
+      if [[ -n "$PYENV_VERSION" && "${TRAVIS_OS_NAME}" = 'osx' ]]; then
+        wget https://github.com/praekeltfoundation/travis-pyenv/releases/download/0.4.0/setup-pyenv.sh
+        source setup-pyenv.sh
+        export PATH="${PYENV_ROOT}/bin:$PATH"
+      fi
+  - |
+      if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
+        export CXX=g++-6
+        cd /opt/pyenv && git pull origin master && cd -
+        export PATH=/opt/pyenv/versions/${PYENV_VERSION}/bin:${PATH}
+        ls /opt/pyenv/verions/${PYENV_VERSON}/bin
+      fi
   - pyenv install ${PYENV_VERSION}
   - pyenv global ${PYENV_VERSION}
 install:  
@@ -29,8 +40,6 @@ install:
   - pip install --user scikit-build
   - pip install --user twine
   - pip install --user wheel
-  - export PATH=/opt/pyenv/versions/${PYENV_VERSION}/bin:${PATH}
-  - ls /opt/pyenv/verions/${PYENV_VERSON}/bin
 script:
   - python setup.py install --user
   - python setup.py test
