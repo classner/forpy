@@ -58,8 +58,10 @@ endif ()
 set (REQ_CPP11_FEATURES
      cxx_strong_enums
      cxx_auto_type)
-# Use optimizations.
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftree-vectorize -ffast-math")
+   # Use optimizations.
+if (NOT WIN32)
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftree-vectorize -ffast-math")
+endif ()
 
 # Fix clang warnings.
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
