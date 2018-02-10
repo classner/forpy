@@ -35,3 +35,9 @@ script:
   - pip install --user scikit-build
   - python setup.py install --user
   - python setup.py test
+deploy:
+  provider: pypi
+  user: classner
+  password:
+    secure: "xvUMvOco/UCiNmnXQw8A1oaAlGyUhdfOI+lxFVZ5Hgpmo2AHIHISwxhtAXu2WpvpFw+8qSxso1Xl2CxxxM4lVj3cnl/i5n04DFwz/3weJJEcQwJfR5s+hXnWHNsCszF+oVPQDXMiPkkXiHWDBih6iZJTzCubVuT/DCmg03dX4wDyQDzHALaLbhH9FLAmKlG5KYjax1vEk4Yd7AHznhRKuE/jjum/7CYGdownJ9Yqq4BquG65Os7OMBgbCJBBmH86mKlzqmuxeOD4gssxSfCVlzQHAL2woEZEB9BqJhJ/ehkBmJIPKkEl91rM92BQ/qgozp/ENJwRdx8n4p7pdOiFwYoSDjMSrFCuHQVfm3GJclVHH/MmFAjr2ePtiqTE4orE/Qjr+d4FKpdxLoLOEKm2q0razAeeS3sakkljg2PY6DYuX7cfsPsgiXiFYCVWC7uU9qqkt1L+Fj9+tEdreaqpfzMcqtWeLPaLH7IlxAmau/604Pxq8MZJGL/8th9+hpaxZnDWvmPQGDrtLSv/tjPWraKNuwmwgBK+B5xf3JPTV/HYfbKPqwAEVl9u5LVzwl2nn2JFLssRf0JWn/4OwWzr3zjisLJ5XA0lUTdF9jRrWfiJjQ/9Y3knYuGtGdt0c/Q1oCcX61yd9c3Z35lElhd2zVr6BeXwIQ/JdH5ny31b2pI="
+  distributions: "sdist bdist_wheel"
