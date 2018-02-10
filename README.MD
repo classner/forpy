@@ -1,6 +1,6 @@
 # forpy
 
-[![PyPI version](https://badge.fury.io/py/forpy.svg)](https://pypi.python.org/pypi/forpy) [![Build Status](https://travis-ci.org/classner/forpy.svg?branch=master)](https://travis-ci.org/classner/forpy)[![Documentation](https://readthedocs.org/projects/forpy/badge/?version=latest)](http://forpy.readthedocs.io/en/latest/)
+[![PyPI version](https://badge.fury.io/py/forpy.svg)](https://pypi.python.org/pypi/forpy) [![Build Status](https://travis-ci.org/classner/forpy.svg?branch=master)](https://travis-ci.org/classner/forpy) [![Documentation](https://readthedocs.org/projects/forpy/badge/?version=latest)](http://forpy.readthedocs.io/en/latest/)
 
 Elegant Decision Forests in Python. Fast, clean and clear C++14 implementation
 with no dependencies and with an easy to use interface in Python and C++.
@@ -82,13 +82,13 @@ build; cmake ..; cmake --build . -- -j` for an out-of-source build.
 ## Benchmarks
 
 For the following plot, artificial random data is used to build maximally deep
-trees. The benchmarks have been recorded on an Intel i7@2.8Ghz with four
+trees. The benchmarks have been recorded on an Intel i7 @ 2.8Ghz with four
 physical cores.
 
-![](https://github.com/classner/forpy/blob/master/build_support/benchmarks/timings_dset.png)
-![](https://github.com/classner/forpy/blob/master/build_support/benchmarks/timings_n_annots.png)
-![](https://github.com/classner/forpy/blob/master/build_support/benchmarks/timings_n_features.png)
-![](https://github.com/classner/forpy/blob/master/build_support/benchmarks/timings_n_threads.png)
+<img src="https://github.com/classner/forpy/blob/master/build_support/benchmarks/timings_dset.png" width="250">
+<img src="https://github.com/classner/forpy/blob/master/build_support/benchmarks/timings_n_annots.png" width="250">
+<img src="https://github.com/classner/forpy/blob/master/build_support/benchmarks/timings_n_features.png" width="250">
+<img src="https://github.com/classner/forpy/blob/master/build_support/benchmarks/timings_n_threads.png" width="250">
 
 ## Development & Contributing
 
