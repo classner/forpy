@@ -16,3 +16,5 @@ test/python/timings_n_annots.png
 test/python/timings_n_features.png
 test/python/timings_n_threads.png
 .*_cache
+docs/html/html
+docs/html/xml
