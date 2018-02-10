@@ -85,10 +85,10 @@ For the following plot, artificial random data is used to build maximally deep
 trees. The benchmarks have been recorded on an Intel i7@2.8Ghz with four
 physical cores.
 
-![](https://github.com/classner/forpy/blob/master/build_support/benchmarks/timings_dset.png | width=250)
-![](https://github.com/classner/forpy/blob/master/build_support/benchmarks/timings_n_annots.png | width=250)
-![](https://github.com/classner/forpy/blob/master/build_support/benchmarks/timings_n_features.png | width=250)
-![](https://github.com/classner/forpy/blob/master/build_support/benchmarks/timings_n_threads.png | width=250)
+![](https://github.com/classner/forpy/blob/master/build_support/benchmarks/timings_dset.png)
+![](https://github.com/classner/forpy/blob/master/build_support/benchmarks/timings_n_annots.png)
+![](https://github.com/classner/forpy/blob/master/build_support/benchmarks/timings_n_features.png)
+![](https://github.com/classner/forpy/blob/master/build_support/benchmarks/timings_n_threads.png)
 
 ## Development & Contributing
 
