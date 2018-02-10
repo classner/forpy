@@ -18,11 +18,9 @@ cache:
     - $HOME/.pyenv_cache
 before_install:
   - "[ ${TRAVIS_OS_NAME} = 'linux' ] && export CXX=g++-6 || true"
-  - |
-      if [[ -n "$PYENV_VERSION" ]]; then
-        wget https://github.com/praekeltfoundation/travis-pyenv/releases/download/0.4.0/setup-pyenv.sh
-        source setup-pyenv.sh
-      fi
+  - cd /opt/pyenv/plugins/python-build/../.. && git pull && cd -
+  - pyenv install ${PYENV_VERSION}
+  - pyenv global ${PYENV_VERSION}
 install:  
   - pip install --user numpy
   - pip install --user scipy
