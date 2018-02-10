@@ -1,44 +1,37 @@
 language: cpp
-compiler:
-  - gcc
-  - clang
 os:
   - osx
   - linux
 osx_image: xcode9.2
-python:
-  - "2.7"
-  - "3.5"
-  - "3.6"
-matrix:
-  exclude:
-    - os: linux
-      compiler: gcc
-    - os: linux
-      compiler: clang
-    - os: osx
-      compiler: gcc
+env:
+  - PYENV_VERSION='2.7.13' PYENV_VERSION_STRING='Python 2.7.13'
+  - PYENV_VERSION='3.6.4' PYENV_VERSION_STRING='Python 3.6.4'
 addons:
   apt:
     sources:
       - ubuntu-toolchain-r-test
-      - llvm-toolchain-precise-3.8
     packages:
       - g++-6
-      - clang-3.8
-      - python-pip
-      - python-numpy
-      - python-scipy
-      - python-matplotlib
-      - python-tornado
+cache:
+  - pip
+  - directories:
+    - $HOME/.pyenv_cache
+before_install:
+  - "[ ${TRAVIS_OS_NAME} = 'linux' ] && export CXX=g++-6 || true"
+  - |
+      if [[ -n "$PYENV_VERSION" ]]; then
+        wget https://github.com/praekeltfoundation/travis-pyenv/releases/download/0.4.0/setup-pyenv.sh
+        source setup-pyenv.sh
+      fi
 install:  
-  - "[ ${TRAVIS_OS_NAME} = 'linux' && ${CXX} = g++ ] && export CXX=g++-6 || true"
-  - "[ ${TRAVIS_OS_NAME} = 'linux' && ${CXX} = clang++ ] && export CXX=clang++-3.8 || true"
-  - "[ ${TRAVIS_OS_NAME} = 'osx' ] && pip install --user scikit-build matplotlib || true"
-script:
+  - pip install --user numpy
+  - pip install --user scipy
+  - pip install --user matplotlib
+  - pip install --user sklearn
   - pip install --user scikit-build
   - pip install --user twine
   - pip install --user wheel
+script:
   - python setup.py install --user
   - python setup.py test
 deploy:
