@@ -3,6 +3,7 @@ if (WIN32)
   STRING(REGEX REPLACE "/" "\\\\" CURR_SRC_DIR "${CURRENT_SOURCE_DIR}")
   STRING(REGEX REPLACE "/" "\\\\" PREF_DIR "${CMAKE_CURRENT_BINARY_DIR}/glog")
   message ("CURR_BIN_DIR ${CURR_BIN_DIR}")
+  message ("CURR_SRC_DIR copy source: ${CURR_SRC_DIR}\\glog-build")
   ExternalProject_Add (glog
     PREFIX ${PREF_DIR}
     # Just providing a SOURCE_DIR doesn't seem to work for all builders (e.g.,
