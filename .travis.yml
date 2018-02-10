@@ -18,7 +18,7 @@ cache:
     - $HOME/.pyenv_cache
 before_install:
   - "[ ${TRAVIS_OS_NAME} = 'linux' ] && export CXX=g++-6 || true"
-  - cd /opt/pyenv/plugins/python-build/../.. && git pull && cd -
+  - cd /opt/pyenv && git pull && cd -
   - pyenv install ${PYENV_VERSION}
   - pyenv global ${PYENV_VERSION}
 install:  
@@ -29,6 +29,8 @@ install:
   - pip install --user scikit-build
   - pip install --user twine
   - pip install --user wheel
+  - export PATH=/opt/pyenv/versions/${PYENV_VERSION}/bin:${PATH}
+  - ls /opt/pyenv/verions/${PYENV_VERSON}/bin
 script:
   - python setup.py install --user
   - python setup.py test
