@@ -1,6 +1,6 @@
 if (WIN32)
-  STRING(REGEX REPLACE "\\\\" "/" CURR_BIN_DIR ${CMAKE_CURRENT_BINARY_DIR})
-  STRING(REGEX REPLACE "\\\\" "/" CURR_SRC_DIR ${CURRENT_SOURCE_DIR})
+  STRING(REGEX REPLACE "\\\\" "/" CURR_BIN_DIR "${CMAKE_CURRENT_BINARY_DIR}")
+  STRING(REGEX REPLACE "\\\\" "/" CURR_SRC_DIR "${CURRENT_SOURCE_DIR}")
   ExternalProject_Add (glog
     PREFIX "${CMAKE_CURRENT_BINARY_DIR}/glog"
     # Just providing a SOURCE_DIR doesn't seem to work for all builders (e.g.,
