@@ -33,6 +33,8 @@ install:
   - "[ ${TRAVIS_OS_NAME} = 'osx' ] && pip install --user scikit-build matplotlib || true"
 script:
   - pip install --user scikit-build
+  - pip install --user twine
+  - pip install --user wheel
   - python setup.py install --user
   - python setup.py test
 deploy:
