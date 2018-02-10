@@ -124,7 +124,7 @@ enable_testing()
 #add_subdirectory (examples/c++)
 
 # Create the documentation.
-add_subdirectory (doc)
+add_subdirectory (docs)
 get_directory_property(DOXYGEN_FOUND DIRECTORY doc DEFINITION DOXYGEN_FOUND)
 
 # Summarize.
