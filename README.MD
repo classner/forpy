@@ -1,5 +1,7 @@
 # forpy
 
+[![PyPI version](https://badge.fury.io/py/forpy.svg)](https://pypi.python.org/pypi/forpy) [![Build Status](https://travis-ci.org/classner/forpy.svg?branch=master)](https://travis-ci.org/classner/forpy)[![Documentation](https://readthedocs.org/projects/forpy/badge/?version=latest)](http://forpy.readthedocs.io/en/latest/)
+
 Elegant Decision Forests in Python. Fast, clean and clear C++14 implementation
 with no dependencies and with an easy to use interface in Python and C++.
 
@@ -62,11 +64,31 @@ and algorithm implementations. Core building blocks are:
   with [cpptask](https://github.com/Kolkir/cpptask) to be efficient and
   cross-platform.
 
+## Documentation
+
+API documentation can be found [here](http://forpy.readthedocs.io/en/latest/).
+Check out the tests for usage examples. The interface largely precisely matches
+the one of scikit-learn (`forpy.ClassificationTree`, `forpy.RegressionTree`,
+`forpy.ClassificationForest` and `forpy.RegressionForest` are even fully
+compatible to the scikit learn predictor API and can be used within the
+hyperparameter optimization functions out of the box).
+
 ## Compilation & Installation
 
 If you want to use it from python, a simple `python setup.py install` should do.
 If you want to use it from C++, you can rely on CMake and do `mkdir build; cd
 build; cmake ..; cmake --build . -- -j` for an out-of-source build.
+
+## Benchmarks
+
+For the following plot, artificial random data is used to build maximally deep
+trees. The benchmarks have been recorded on an Intel i7@2.8Ghz with four
+physical cores.
+
+![](https://github.com/classner/forpy/blob/master/build_support/benchmarks/timings_dset.png | width=250)
+![](https://github.com/classner/forpy/blob/master/build_support/benchmarks/timings_n_annots.png | width=250)
+![](https://github.com/classner/forpy/blob/master/build_support/benchmarks/timings_n_features.png | width=250)
+![](https://github.com/classner/forpy/blob/master/build_support/benchmarks/timings_n_threads.png | width=250)
 
 ## Development & Contributing
 

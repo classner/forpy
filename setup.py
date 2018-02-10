@@ -60,6 +60,11 @@ setup(
     name='forpy',
     author='Christoph Lassner',
     author_email='mail@christophlassner.de',
+    url='https://github.com/classner/forpy',
+    download_url='https://github.com/classner/forpy/tarball/v{}'.format(
+        VERSION),
+    keywords='random forests decision machine learning',
+    classifiers=[],
     py_modules=['forpy'],
     cmake_source_dir='.',
     cmake_install_dir='',
