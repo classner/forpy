@@ -2,10 +2,18 @@
 #ifndef FORPY_UTIL_STORAGE_H_
 #define FORPY_UTIL_STORAGE_H_
 
+#ifdef __GNUC__
+#ifndef __clang__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wreturn-local-addr"
+#endif
+#endif
 #include <mapbox/variant_cast.hpp>
+#ifdef __GNUC__
+#ifndef __clang__
 #pragma GCC diagnostic pop
+#endif
+#endif
 #include "./serialization/variant.h"
 
 namespace forpy {

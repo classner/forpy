@@ -73,11 +73,12 @@ class TestThreshopt(unittest.TestCase):
         rto = forpy.RegressionOpt()
         rto.check_annotations(self.pdp_reg_w)
         rto.full_entropy(self.pdp_reg_w)
-        self.assertEqual(rto.full_entropy(self.pdp_reg_w), 637.6682739257812)
+        self.assertAlmostEqual(
+            rto.full_entropy(self.pdp_reg_w), 637.6682739257812)
         res = rto.optimize(self.pdp_reg_w, 0)
         self.assertEqual(res.split_idx, 15)
         self.assertEqual(res.thresh, 72.5)
-        self.assertEqual(res.gain, 37492.359375)
+        self.assertTrue(np.abs(res.gain - 37492.359375) < 0.1)
         self.assertEqual(res.valid, True)
 
     def test_classification(self):
@@ -97,7 +98,7 @@ class TestThreshopt(unittest.TestCase):
         res = rto.optimize(self.pdp, 0)
         self.assertEqual(res.split_idx, 15)
         self.assertEqual(res.thresh, 72.5)
-        self.assertEqual(res.gain, 0.2666666805744171)
+        self.assertAlmostEqual(res.gain, 0.2666666805744171)
         self.assertEqual(res.valid, True)
         # Entropies.
         for entr in [
@@ -139,11 +140,12 @@ class TestThreshopt(unittest.TestCase):
                 np.sort(np.unique(rto.class_translation)) ==
                 [0] + list(range(30, 60, 2))))
         rto.full_entropy(self.pdp_w)
-        self.assertEqual(rto.full_entropy(self.pdp_w), 0.9028487801551819)
+        self.assertAlmostEqual(
+            rto.full_entropy(self.pdp_w), 0.9028487801551819)
         res = rto.optimize(self.pdp_w, 0)
         self.assertEqual(res.split_idx, 15)
         self.assertEqual(res.thresh, 72.5)
-        self.assertEqual(res.gain, 0.14957934617996216)
+        self.assertAlmostEqual(res.gain, 0.14957934617996216)
         self.assertEqual(res.valid, True)
 
     def test_fast_class_opt(self):

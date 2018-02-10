@@ -23,7 +23,7 @@ class TestTree(unittest.TestCase):
         self.dta_t = np.ascontiguousarray(self.dta.T)
         self.dprov = forpy.FastDProv(self.dta_t, self.annot)
         self.wdta = np.random.normal(size=(1, 32)).astype(np.float32)
-        self.wannot = np.random.randint(0, 10, size=(32, 1), dtype=np.uint32)
+        self.wannot = np.random.randint(0, 10, size=(32, 1)).astype(np.uint32)
         self.weights = np.random.normal(size=(32, ))
         self.weights += np.abs(self.weights.min())
         self.wprov = forpy.FastDProv(self.wdta, self.wannot, self.weights)

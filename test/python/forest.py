@@ -33,7 +33,6 @@ class TestForest(unittest.TestCase):
         self.assertTrue(
             np.all(
                 np.argmax(forest.predict_proba(self.dta), axis=1) == range(5)))
-        self.assertTrue(np.all(np.array(forest.depths) > 0))
         self.assertTrue(np.allclose(forest.tree_weights, 1.))
         self.assertEqual(len(forest.trees), 10)
         self.assertEqual(forest.get_input_data_dimensions(), 4)
@@ -55,7 +54,6 @@ class TestForest(unittest.TestCase):
         self.assertTrue(
             np.all(
                 np.argmax(forest.predict_proba(self.dta), axis=1) == range(5)))
-        self.assertTrue(np.all(np.array(forest.depths) > 0))
         self.assertTrue(np.allclose(forest.tree_weights, 1.))
         self.assertEqual(len(forest.trees), 10)
         self.assertEqual(forest.get_input_data_dimensions(), 4)
@@ -77,7 +75,6 @@ class TestForest(unittest.TestCase):
         self.assertTrue(
             np.all(
                 np.argmax(forest.predict_proba(self.dta), axis=1) == range(5)))
-        self.assertTrue(np.all(np.array(forest.depths) > 0))
         self.assertTrue(np.allclose(forest.tree_weights, 1.))
         self.assertEqual(len(forest.trees), 10)
         self.assertEqual(forest.get_input_data_dimensions(), 4)
