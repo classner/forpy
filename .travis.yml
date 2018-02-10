@@ -28,9 +28,9 @@ before_install:
         export CXX=g++-6
         cd /opt/pyenv && git pull origin master && cd -
         export PATH=/opt/pyenv/versions/${PYENV_VERSION}/bin:${PATH}
-        ls /opt/pyenv/verions/${PYENV_VERSON}/bin
+        pyenv install ${PYENV_VERSION}
+        ls /opt/pyenv/verions/${PYENV_VERSION}/bin
       fi
-  - pyenv install ${PYENV_VERSION}
   - pyenv global ${PYENV_VERSION}
 install:  
   - pip install --user numpy
