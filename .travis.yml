@@ -21,4 +21,5 @@ install:
 script:
   - pip install --user scikit-build
   - python setup.py install --user
+  - cd test/python && GLOG_v=100 ./forest.py
   - python setup.py test
