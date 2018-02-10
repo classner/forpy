@@ -15,6 +15,9 @@
 
 namespace forpy {
 
+/** \brief Convenience typedef for unsigned int. */
+typedef unsigned int uint;
+
 /**
  * \brief Struct for translating primitive types to a short name.
  */
@@ -108,9 +111,6 @@ typedef size_t id_t;
 typedef std::function<id_t(const Data<MatCRef> &, const id_t &,
                            const std::function<void(void *)> &)>
     node_predf;
-
-/** \brief Convenience typedef for unsigned int. */
-typedef unsigned int uint;
 
 /** \brief Specifies which thresholds should be used for a decision. */
 enum class EThresholdSelection { LessEqOnly, GreaterOnly, Both };
