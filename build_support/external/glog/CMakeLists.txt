@@ -1,8 +1,10 @@
 if (WIN32)
   STRING(REGEX REPLACE "\\\\" "/" CURR_BIN_DIR "${CMAKE_CURRENT_BINARY_DIR}")
   STRING(REGEX REPLACE "\\\\" "/" CURR_SRC_DIR "${CURRENT_SOURCE_DIR}")
+  STRING(REGEX REPLACE "\\\\" "/" PREF_DIR "${CMAKE_CURRENT_BINARY_DIR}/glog")
+  message ("CURR_BIN_DIR ${CURR_BIN_DIR}")
   ExternalProject_Add (glog
-    PREFIX "${CMAKE_CURRENT_BINARY_DIR}/glog"
+    PREFIX ${PREF_DIR}
     # Just providing a SOURCE_DIR doesn't seem to work for all builders (e.g.,
     # ninja) and I want to include all dependencies.
     DOWNLOAD_COMMAND mkdir ${CURR_BIN_DIR}
