@@ -1,54 +1,54 @@
 language: cpp
 os:
-  - osx
-  - linux
+- osx
+# - linux
 osx_image: xcode9.2
 env:
-  - PYENV_VERSION='2.7.13' PYENV_VERSION_STRING='Python 2.7.13'
-  - PYENV_VERSION='3.6.4' PYENV_VERSION_STRING='Python 3.6.4'
+- PYENV_VERSION='2.7.13' PYENV_VERSION_STRING='Python 2.7.13'
+- PYENV_VERSION='3.6.4' PYENV_VERSION_STRING='Python 3.6.4'
 addons:
   apt:
     sources:
-      - ubuntu-toolchain-r-test
+    - ubuntu-toolchain-r-test
     packages:
-      - g++-6
+    - g++-6
 cache:
-  - pip
-  - directories:
-    - $HOME/.pyenv_cache
+- pip
+- directories:
+  - "$HOME/.pyenv_cache"
 before_install:
-  - |
-      if [[ -n "$PYENV_VERSION" && "${TRAVIS_OS_NAME}" = 'osx' ]]; then
-        wget https://github.com/praekeltfoundation/travis-pyenv/releases/download/0.4.0/setup-pyenv.sh
-        source setup-pyenv.sh
-        export PATH="${PYENV_ROOT}/bin:$PATH"
-        deactivate
-      fi
-  - |
-      if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
-        export CXX=g++-6
-        cd /opt/pyenv && git pull origin master && cd -
-        export PATH=/opt/pyenv/versions/${PYENV_VERSION}/bin:${PATH}
-        pyenv install ${PYENV_VERSION}
-        ls /opt/pyenv/versions/${PYENV_VERSION}/bin
-      fi
-  - pyenv global ${PYENV_VERSION}
-install:  
-  - pip install --user numpy
-  - pip install --user scipy
-  - pip install --user matplotlib
-  - pip install --user sklearn
-  - pip install --user scikit-build
-  - pip install --user twine
-  - pip install --user wheel
+- |
+  if [[ -n "$PYENV_VERSION" && "${TRAVIS_OS_NAME}" = 'osx' ]]; then
+    wget https://github.com/praekeltfoundation/travis-pyenv/releases/download/0.4.0/setup-pyenv.sh
+    source setup-pyenv.sh
+    export PATH="${PYENV_ROOT}/bin:$PATH"
+    deactivate
+  fi
+- |
+  if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
+    export CXX=g++-6
+    cd /opt/pyenv && git pull origin master && cd -
+    export PATH=/opt/pyenv/versions/${PYENV_VERSION}/bin:${PATH}
+    pyenv install ${PYENV_VERSION}
+    ls /opt/pyenv/versions/${PYENV_VERSION}/bin
+  fi
+- pyenv global ${PYENV_VERSION}
+install:
+- pip install --user numpy
+- pip install --user scipy
+- pip install --user matplotlib
+- pip install --user sklearn
+- pip install --user scikit-build
+- pip install --user twine
+- pip install --user wheel
 script:
-  - python setup.py install --user
-  - python setup.py test
+- python setup.py install --user
+- python setup.py test
 deploy:
   provider: pypi
   user: classner
   password:
-    secure: "qg/bgxBxjZMR5AeJQ74zwpxLtsHCH0M4a4h0aGByi7zc1g5TXfANKpCGiXRbXN6+jnbLyRWz7Bj6SIA8EhZ5gKgwtHPxZ5cfaJqGf7r4nX0qVwob+UzoQ9jZSLHrkJbD8wS3V++DBIKpn7ErGQY+FRW4mCLrmdT1O0oiKSw7ecJkL3en/CD1XLdqkMK2V6Xyz+kRIMX3fogLUotj0x48abNZkOugkKcg5pGITHY0QdAAxkLsfl3vXcy9NDYaSJenwL0qV61bgDnANc2T6PWix3s2CkxAbznkVZP4tpsQPYyBRAR1wHQ1uG23v41SQV20LzMuzSvqkrq7tyZA272rNGPn8D3Z8tv5bexyS+ODBrO5kfwpzKrLCLQK5IfGhvcRzTfROFV8C22OI9STmM0XvfTepkWwbdHkvVTBjAQ4nwM/HV0Q+b9FKxsvENsudq1u4Spi89BBho6a1O/IyinZ1VwR6AL1fy+RS8lRYCdWEoqrJiBst9VhMc2FBF/lrdYbYyK8xNylpbfPv73gCIYa7oEnf8sdzxzaguuArvhzKlJNv7+RqKDgzo6gJCoDR1FTcTUIAso6gtnBvVDqiXQmTurcbkR/b767Lj9vxVNXCIpfLIbEd2LHfDQaDvTl/0esaOCFLZRmMyYZW8H/tNEkLhRTlZ5CZBMIAQezS984/TQ="
+    secure: Wlcu0RuafPIIUcpy1cQcQ2nM4eT1DldoB1N46LcTTMQoWSgJFOfgZOkhSexUGN6SdynPtZxAQspU/rL91Y13dgOEq8Es+sANEB9AnXGz8G3hd22Z2nBkFFrvTJeQpS/HAoiRm9KZ9On5QrW9xbK9rwBe4zS7i4i+aIHBKqmoKvAwGuUaGz5a/dfClW5wMxbq4rsqCqYazBbFH98fiabKlGk6aX7JH9VrIEHoo+A2ZkGfYeZdmLuKcJktUbaqx9+yF9NPjKiBhMwUh8iS9maGIroRz5VGxf0Xm5VU7hb/Zja0dXKT9zpHIEysaRbH3kCXib9ytAIsH+JhFnF9bjO8RVG73lP47vNCRRDAv25/KK8gjebh4rpxceP9z94hCL+si0nzflwYx9ya8nNV39R6GmhQdw0xWzNuJp6vq2hYAvPNMFVB53umCDiMSs+UBCPkKhOM1ZaY8Sja8XUqUIwcgdneoKGjHyURSvemoFt+suzXYDL8V9W+0WhLGzGHoYNUeIpvnbaU1X9l3plxYXE+40OA2WM5nc9qctVZcm1Fpk4ORgCi4+BCniyBFFiiWcKEAmJLtS+KMbqH66uFmw5UngPwcxyG13DkZ15mL0EnIiXF/CFb5ki9Nxo5PbH4MN30Euc90CWWH6lSCISSfALCoBtJCh8UV4LUqZQF+o02WxY=
   skip_cleanup: true
   server: https://upload.pypi.org/legacy/
-  distributions: "sdist bdist_wheel"
+  distributions: sdist bdist_wheel
