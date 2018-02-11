@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 """Getting data into the framework properly."""
 # pylint: disable=no-member
 import os.path as path

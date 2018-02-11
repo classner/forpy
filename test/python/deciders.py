@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 """Check the deciders."""
 # pylint: disable=no-member, invalid-name
 import os.path as path
