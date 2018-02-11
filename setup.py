@@ -3,6 +3,7 @@
 """The setup script for the forpy project."""
 from __future__ import print_function
 
+import platform
 import subprocess
 import sys
 import unittest
@@ -56,6 +57,16 @@ def python_test_suite():
     return test_suite
 
 
+if platform.system() == 'linux':
+    CORE_LIB_FE = '.so'
+    FORPY_LIB_FE = '.so'
+elif platform.system() == 'Darwin':
+    CORE_LIB_FE = '.dylib'
+    FORPY_LIB_FE = '.so'
+else:
+    CORE_LIB_FE = '.dll'
+    FORPY_LIB_FE = '.dll'
+
 setup(
     name='forpy',
     author='Christoph Lassner',
@@ -65,7 +76,11 @@ setup(
         VERSION),
     keywords='random forests decision machine learning',
     classifiers=[],
-    py_modules=['forpy'],
+    data_files=[('lib/python{}.{}/site-packages'.format(
+        sys.version_info[0], sys.version_info[1]), [
+            'libforpy_core{}'.format(CORE_LIB_FE),
+            'forpy{}'.format(FORPY_LIB_FE)
+        ])],
     cmake_source_dir='.',
     cmake_install_dir='',
     cmake_args=[
@@ -73,8 +88,7 @@ setup(
         '-DPYTHON_EXECUTABLE=' + sys.executable,
     ],
     test_suite='setup.python_test_suite',
-    setup_requires=['numpy'],
+    setup_requires=['numpy', 'scikit-build'],
     install_requires=['numpy', 'scipy', 'matplotlib', 'sklearn'],
     version=VERSION,
-    license='BSD 2-clause',
-)
+    license='BSD 2-clause')

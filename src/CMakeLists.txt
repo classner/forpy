@@ -48,3 +48,4 @@ add_custom_command (TARGET forpy_core POST_BUILD
      "${CMAKE_BINARY_DIR}/examples/c++/$<TARGET_FILE_NAME:forpy_core>"
   COMMENT "Copying to C++ examples directory")
 install (TARGETS forpy_core DESTINATION examples/c++)
+install(TARGETS forpy_core LIBRARY DESTINATION .)

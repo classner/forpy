@@ -37,5 +37,6 @@ if (WITH_PYTHON)
     COMMAND "${CMAKE_COMMAND}" -E copy
        "$<TARGET_FILE:forpy>"
        "${PROJECT_SOURCE_DIR}/$<TARGET_FILE_NAME:forpy>"
-    COMMENT "Copying to root directory")
+       COMMENT "Copying to root directory")
+  install(TARGETS forpy LIBRARY DESTINATION .)
 endif()

@@ -9,7 +9,7 @@ include(cotire)  # Automatic precompiled headers for fast builds.
 # Versioning.
 set (forpy_VERSION_MAJOR 2)
 set (forpy_VERSION_MINOR 0)
-set (forpy_VERSION_PATCH 1)
+set (forpy_VERSION_PATCH 2)
 set (forpy_VERSION
   "${forpy_VERSION_MAJOR}.${forpy_VERSION_MINOR}.${forpy_VERSION_PATCH}")
 set (forpy_VERSION_NUMBER
