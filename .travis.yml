@@ -53,3 +53,8 @@ deploy:
   skip_cleanup: true
   server: https://upload.pypi.org/legacy/
   distributions: bdist_wheel
+  on:
+    tags: true
+    branches:
+      only:
+        - master
