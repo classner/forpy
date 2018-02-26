@@ -13,6 +13,7 @@ addons:
     - ubuntu-toolchain-r-test
     packages:
     - g++-7
+    - libtcmalloc-minimal4
 cache:
 - pip
 - directories:
@@ -32,6 +33,7 @@ before_install:
     export PATH=/opt/pyenv/versions/${PYENV_VERSION}/bin:${PATH}
     pyenv install ${PYENV_VERSION}
     ls /opt/pyenv/versions/${PYENV_VERSION}/bin
+    export LD_PRELOAD="/usr/lib/libtcmalloc_minimal.so.4"
   fi
 - pyenv global ${PYENV_VERSION}
 install:
