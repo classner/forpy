@@ -7,6 +7,13 @@ env:
 - PYENV_VERSION='2.7.13' PYENV_VERSION_STRING='Python 2.7.13'
 - PYENV_VERSION='3.5.5' PYENV_VERSION_STRING='Python 3.5.5'
 - PYENV_VERSION='3.6.4' PYENV_VERSION_STRING='Python 3.6.4'
+matrix:
+  exclude:
+    - os: linux
+      env: PYENV_VERSION='2.7.13' PYENV_VERSION_STRING='Python 2.7.13'
+    - os: linux
+      env: PYENV_VERSION='3.5.5' PYENV_VERSION_STRING='Python 3.5.5'
+
 addons:
   apt:
     sources:
