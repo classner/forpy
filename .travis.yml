@@ -44,7 +44,7 @@ before_install:
   fi
 - pyenv global ${PYENV_VERSION}
 install:
-- pip install --user --no-binary=:all: numpy
+- "pip install --user --no-binary=:all: numpy"
 - pip install --user scipy
 - pip install --user matplotlib
 - pip install --user sklearn
