@@ -47,13 +47,31 @@ install:
   - "%CMD_IN_ENV% pip install tornado"
   - "%CMD_IN_ENV% pip install scikit-build"
 
+  # Install Ninja
+  - set NINJA_URL="https://github.com/ninja-build/ninja/releases/download/v1.6.0/ninja-win.zip"
+  - appveyor DownloadFile %NINJA_URL% -FileName ninja.zip
+  - mkdir C:\build_support
+  - 7z x ninja.zip -oC:\build_support\ninja > nul
+  - set PATH=C:\build_support\ninja;%PATH%
+  - ninja --version
+
+  # Setup clang.
+  - set PATH="C:\Program Files\LLVM\bin";%PATH%
+  - clang-cl -v
+
+before_build:
+  - call "C:\Program Files (x86)\Microsoft Visual Studio 15.0\VC\vcvarsall.bat" amd64
+
 build_script:
   # Build the compiled extension
-  - "%CMD_IN_ENV% python setup.py build"
+  - "%CMD_IN_ENV% mkdir build"
+  - "%CMD_IN_ENV% cd build"
+  - "%CMD_IN_ENV% cmake .. -GNinja -DCMAKE_CXX_COMPILER=clang-cl"
+  - "%CMD_IN_ENV% cmake --build ."
 
 test_script:
   # Run the project tests
-  - "%CMD_IN_ENV% python setup.py test"
+  - "%CMD_IN_ENV% cmake --build . --target test"
 
 after_test:
   # If tests are successful, create binary packages for the project.
