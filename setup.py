@@ -57,10 +57,10 @@ def python_test_suite():
     return test_suite
 
 
-if platform.system() == 'linux':
+if platform.system().lower() == 'linux':
     CORE_LIB_FE = '.so'
     FORPY_LIB_FE = '.so'
-elif platform.system() == 'Darwin':
+elif platform.system().lower() == 'darwin':
     CORE_LIB_FE = '.dylib'
     FORPY_LIB_FE = '.so'
 else:
